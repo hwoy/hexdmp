@@ -6,7 +6,7 @@
 #define BASE 16
 #define BSIZE 1024
 #define DELIM ','
-#define LEN 3
+#define LEN 2
 
 #define OFFLEN 8
 #define OFFBASE 16
@@ -95,7 +95,7 @@ main (int argc, const char *argv[])
 
 	case e_opthex:
 	  ui_base = 16;
-	  ui_len = 3;
+	  ui_len = 2;
 
 	  if (!ui_colflag)
 	    ui_col = 16;
@@ -107,7 +107,7 @@ main (int argc, const char *argv[])
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
 	      return showErr (cpa_err, e_errpar);
 	    }
-	  ui_col = s2ui (carr_buff);
+	  ui_col = s2ui (carr_buff,10);
 	  ui_colflag = 1;
 
 	  break;
