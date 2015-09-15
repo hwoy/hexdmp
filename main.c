@@ -136,13 +136,22 @@ main (int argc, const char *argv[])
 	  break;
 
 	case e_optcol:
-	  if (!isUint (carr_buff))
+	  if (!isUint (carr_buff)
+	      && (!isUintHex (&carr_buff[strlen (carr_hexpref)])
+		  || strncmp (carr_buff, carr_hexpref,
+			      strlen (carr_hexpref))))
 	    {
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
 	      return showErr (cpa_err, e_errpar);
 	    }
+	  i =
+	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
+	    10;
 
-	  if (!(ui_col = s2ui (carr_buff, 10)))
+
+	  if (!
+	      (ui_col =
+	       s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i)))
 
 	    {
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
