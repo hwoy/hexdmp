@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "opt.h"
 #include "function.h"
 
@@ -37,6 +38,8 @@ enum _err
 };
 
 
+static const char carr_hexpref[] = "0x";
+
 
 static const char *cpa_opt[] =
   { "-b", "-o", "-t", "-h", "-a", "-c:", "-s:", "-l:", NULL };
@@ -63,6 +66,7 @@ main (int argc, const char *argv[])
   static char carr_buff[BSIZE];
   unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag,
     ui_asciiflag, ui_start, ui_length;
+  unsigned int i;
 
   if (argc == 1)
     {
@@ -138,22 +142,32 @@ main (int argc, const char *argv[])
 	  break;
 
 	case e_optstart:
-	  if (!isUint (carr_buff))
+	  if (!isUint (carr_buff)
+	      && !isUintHex (&carr_buff[strlen (carr_hexpref)]))
 	    {
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
 	      return showErr (cpa_err, e_errpar);
 	    }
-	  ui_start = s2ui (carr_buff, 10);
+	  i =
+	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
+	    10;
+	  ui_start =
+	    s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
 
 	  break;
 
 	case e_optlength:
-	  if (!isUint (carr_buff))
+	  if (!isUint (carr_buff)
+	      && !isUintHex (&carr_buff[strlen (carr_hexpref)]))
 	    {
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
 	      return showErr (cpa_err, e_errpar);
 	    }
-	  ui_length = s2ui (carr_buff, 10);
+	  i =
+	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
+	    10;
+	  ui_length =
+	    s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
 
 	  break;
 

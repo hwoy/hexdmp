@@ -4,3 +4,5 @@ int isUint (const char *);
 unsigned int pow2ui (unsigned int, unsigned int);
 unsigned int s2ui (const char *, unsigned int);
 unsigned int sLen (const char *);
+
+unsigned isUintHex(const char *);

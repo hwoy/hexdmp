@@ -110,8 +110,20 @@ sLen (const char *ch)
 {
   unsigned int i;
 
+  for (i = 0; ch[i]; i++);
+  return i;
+}
+
+unsigned
+isUintHex (const char *ch)
+{
+  unsigned int i;
+  if (!sLen (ch))
+    return 0;
   for (i = 0; ch[i]; i++)
     {
+      if (!((ch[i] >= '0' && ch[i] <= '9') || (ch[i] >= 'A' && ch[i] <= 'F')))
+	return 0;
     }
-  return i;
+  return 1;
 }
