@@ -18,15 +18,17 @@ static int showHelp (const char *path, const char *opt[],
 static unsigned int basename (const char *ch);
 int showErr (const char *err[], unsigned int index);
 void dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
-	       unsigned int ui_len);
-void dumpChar (char *carr_buff, unsigned int ui_col);
+	       unsigned int ui_len, unsigned int start, unsigned int length);
+void dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
+	       unsigned int length);
 
 int findStdC (int ch, const char *stdc);
 
 
 enum _opt
 {
-  e_optbin, e_optoct, e_optten, e_opthex, e_optascii, e_optcol
+  e_optbin, e_optoct, e_optten, e_opthex, e_optascii, e_optcol, e_optstart,
+  e_optlength
 };
 
 enum _err
@@ -36,12 +38,14 @@ enum _err
 
 
 
-static const char *cpa_opt[] = { "-b", "-o", "-t", "-h", "-a", "-c", NULL };
+static const char *cpa_opt[] =
+  { "-b", "-o", "-t", "-h", "-a", "-c:", "-s:", "-l:", NULL };
 
 
 static const char *cpa_optdes[] =
   { "Binary show", "Octal Show", "10 base Show", "Hex Show", "ASCII Show",
-  "Col -c{n} n=number of column", NULL
+  "Col -c:{n} n=number of column", "-s:{n} Start to offset n",
+  "-l{n} n=Length of byte for watching", NULL
 };
 
 static const char *cpa_err[] =
@@ -58,7 +62,7 @@ main (int argc, const char *argv[])
 {
   static char carr_buff[BSIZE];
   unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag,
-    ui_asciiflag;
+    ui_asciiflag, ui_start, ui_length;
 
   if (argc == 1)
     {
@@ -71,6 +75,8 @@ main (int argc, const char *argv[])
   ui_len = LEN;
   ui_colflag = 0;
   ui_asciiflag = 0;
+  ui_start = 0;
+  ui_length = (unsigned int) -1;
 
 /******************* Parameter Operation *********************/
 
@@ -131,12 +137,33 @@ main (int argc, const char *argv[])
 
 	  break;
 
+	case e_optstart:
+	  if (!isUint (carr_buff))
+	    {
+	      fprintf (stderr, "PARAM: %s\n", carr_buff);
+	      return showErr (cpa_err, e_errpar);
+	    }
+	  ui_start = s2ui (carr_buff, 10);
+
+	  break;
+
+	case e_optlength:
+	  if (!isUint (carr_buff))
+	    {
+	      fprintf (stderr, "PARAM: %s\n", carr_buff);
+	      return showErr (cpa_err, e_errpar);
+	    }
+	  ui_length = s2ui (carr_buff, 10);
+
+	  break;
+
 	case e_optother:
 
 	  if (ui_asciiflag)
-	    dumpChar (carr_buff, ui_col);
+	    dumpChar (carr_buff, ui_col, ui_start, ui_length);
 	  else
-	    dumpByte (carr_buff, ui_col, ui_base, ui_len);
+	    dumpByte (carr_buff, ui_col, ui_base, ui_len, ui_start,
+		      ui_length);
 	  break;
 
 
@@ -188,7 +215,7 @@ showErr (const char *err[], unsigned int index)
 
 void
 dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
-	  unsigned int ui_len)
+	  unsigned int ui_len, unsigned int start, unsigned int length)
 {
   unsigned int i, j;
   int i_ch;
@@ -205,6 +232,8 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
        (ui_col * (ui_len + 1) - 2 + 2 + OFFLEN -
 	sLen (carr_buff + basename (carr_buff))) / 2; i++)
     putchar (FCHAR);
+
+
   printf (" %s ", carr_buff + basename (carr_buff));
   for (i = 0;
        i <
@@ -213,14 +242,22 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
     putchar ('=');
   putchar ('\n');
 
-  i = 0;
-  j = 0;
 
-  while ((i_ch = fgetc (sptr_fin)) != EOF)
+  for (i = 0, j = 0; (i_ch = fgetc (sptr_fin)) != EOF; j++)
     {
-      if (!((j++) % ui_col))
+
+      if (j < start)
+	continue;
+
+      if (j >= (start + length) && (length != (unsigned int) -1))
 	{
-	  ui2s (j - 1, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	  putchar ('\n');
+	  return;
+	}
+
+      if (!((j - start) % ui_col))
+	{
+	  ui2s (j, carr_buff, BSIZE, OFFBASE, OFFLEN);
 	  printf ("%s: ", carr_buff);
 	}
 
@@ -239,7 +276,8 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 }
 
 void
-dumpChar (char *carr_buff, unsigned int ui_col)
+dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
+	  unsigned int length)
 {
   unsigned int i, j;
   int i_ch;
@@ -265,14 +303,21 @@ dumpChar (char *carr_buff, unsigned int ui_col)
     putchar ('=');
   putchar ('\n');
 
-  i = 0;
-  j = 0;
 
-  while ((i_ch = fgetc (sptr_fin)) != EOF)
+  for (i = 0, j = 0; (i_ch = fgetc (sptr_fin)) != EOF; j++)
     {
-      if (!((j++) % ui_col))
+
+      if (j < start)
+	continue;
+
+      if (j >= (start + length) && (length != (unsigned int) -1))
 	{
-	  ui2s (j - 1, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	  putchar ('\n');
+	  return;
+	}
+      if (!((j - start) % ui_col))
+	{
+	  ui2s (j, carr_buff, BSIZE, OFFBASE, OFFLEN);
 	  printf ("%s: ", carr_buff);
 	}
       if ((k = findStdC (i_ch, carr_stdc)) > 0)
