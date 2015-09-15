@@ -21,6 +21,8 @@ void dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 	       unsigned int ui_len);
 void dumpChar (char *carr_buff, unsigned int ui_col);
 
+int findStdC (int ch, const char *stdc);
+
 
 enum _opt
 {
@@ -36,6 +38,7 @@ enum _err
 
 static const char *cpa_opt[] = { "-b", "-o", "-t", "-h", "-a", "-c", NULL };
 
+
 static const char *cpa_optdes[] =
   { "Binary show", "Octal Show", "10 base Show", "Hex Show", "ASCII Show",
   "Col -c{n} n=number of column", NULL
@@ -44,6 +47,11 @@ static const char *cpa_optdes[] =
 static const char *cpa_err[] =
   { "Parameter isn't an unsigned interger", "File can't be accessed", NULL };
 
+
+static const char carr_stdc[] =
+  { '\0', '\a', '\b', 'f', '\n', '\r', '\t', '\v', '\0', '\0' };
+static const char carr_stdc_str[] =
+  { '0', 'a', 'b', 'f', 'n', 'r', 't', 'v', '\0' };
 
 int
 main (int argc, const char *argv[])
@@ -235,6 +243,7 @@ dumpChar (char *carr_buff, unsigned int ui_col)
 {
   unsigned int i, j;
   int i_ch;
+  int k;
   FILE *sptr_fin;
   if (!(sptr_fin = fopen (carr_buff, "rb")))
     {
@@ -266,14 +275,8 @@ dumpChar (char *carr_buff, unsigned int ui_col)
 	  ui2s (j - 1, carr_buff, BSIZE, OFFBASE, OFFLEN);
 	  printf ("%s: ", carr_buff);
 	}
-      if (i_ch == '\r')
-	printf ("\\r%c", DELIM);
-
-      else if (i_ch == '\n')
-	printf ("\\n%c", DELIM);
-
-      else if (i_ch == '\t')
-	printf ("\\t%c", DELIM);
+      if ((k = findStdC (i_ch, carr_stdc)) > 0)
+	printf ("\\%c%c", carr_stdc_str[k], DELIM);
 
       else
 	printf ("%c%c%c", i_ch, DELIM, DELIM);
@@ -287,4 +290,17 @@ dumpChar (char *carr_buff, unsigned int ui_col)
   putchar ('\n');
   fclose (sptr_fin);
 
+}
+
+int
+findStdC (int ch, const char *stdc)
+{
+  int i;
+  for (i = 0; (stdc[i] != 0) || ((stdc[i + 1] != 0)); i++)
+    {
+      if (ch == stdc[i])
+	return i;
+    }
+
+  return -1;
 }
