@@ -143,7 +143,9 @@ main (int argc, const char *argv[])
 
 	case e_optstart:
 	  if (!isUint (carr_buff)
-	      && !isUintHex (&carr_buff[strlen (carr_hexpref)]))
+	      && (!isUintHex (&carr_buff[strlen (carr_hexpref)])
+		  || strncmp (carr_buff, carr_hexpref,
+			      strlen (carr_hexpref))))
 	    {
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
 	      return showErr (cpa_err, e_errpar);
@@ -158,7 +160,9 @@ main (int argc, const char *argv[])
 
 	case e_optlength:
 	  if (!isUint (carr_buff)
-	      && !isUintHex (&carr_buff[strlen (carr_hexpref)]))
+	      && (!isUintHex (&carr_buff[strlen (carr_hexpref)])
+		  || strncmp (carr_buff, carr_hexpref,
+			      strlen (carr_hexpref))))
 	    {
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
 	      return showErr (cpa_err, e_errpar);
