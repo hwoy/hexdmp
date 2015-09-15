@@ -14,6 +14,9 @@
 #define OFFLEN (sizeof(unsigned int)*8/4)
 #define OFFBASE 16
 
+#define DLENGTH 2
+
+
 static int showHelp (const char *path, const char *opt[],
 		     const char *optdes[], int ret);
 static unsigned int basename (const char *ch);
@@ -34,7 +37,7 @@ enum _opt
 
 enum _err
 {
-  e_errpar, e_errfile
+  e_errpar, e_errfile, e_errzero
 };
 
 
@@ -52,7 +55,9 @@ static const char *cpa_optdes[] =
 };
 
 static const char *cpa_err[] =
-  { "Parameter isn't an unsigned interger", "File can't be accessed", NULL };
+  { "Parameter isn't an unsigned interger", "File can't be accessed",
+  "Column must more than 0", NULL
+};
 
 
 static const char carr_stdc[] =
@@ -136,7 +141,13 @@ main (int argc, const char *argv[])
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
 	      return showErr (cpa_err, e_errpar);
 	    }
-	  ui_col = s2ui (carr_buff, 10);
+
+	  if (!(ui_col = s2ui (carr_buff, 10)))
+
+	    {
+	      fprintf (stderr, "PARAM: %s\n", carr_buff);
+	      return showErr (cpa_err, e_errzero);
+	    }
 	  ui_colflag = 1;
 
 	  break;
@@ -245,18 +256,12 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
       return;
     }
 
-  for (i = 0;
-       i <
-       (ui_col * (ui_len + 1) - 2 + 2 + OFFLEN -
-	sLen (carr_buff + basename (carr_buff))) / 2; i++)
+  for (i = 0; i < DLENGTH; i++)
     putchar (FCHAR);
 
-
   printf (" %s ", carr_buff + basename (carr_buff));
-  for (i = 0;
-       i <
-       (ui_col * (ui_len + 1) - 2 + 2 + OFFLEN -
-	sLen (carr_buff + basename (carr_buff))) / 2; i++)
+
+  for (i = 0; i < DLENGTH; i++)
     putchar ('=');
   putchar ('\n');
 
@@ -308,16 +313,13 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
       return;
     }
 
-  for (i = 0;
-       i <
-       (ui_col * 3 - 2 + 2 - 1 + OFFLEN -
-	sLen (carr_buff + basename (carr_buff))) / 2; i++)
+
+  for (i = 0; i < DLENGTH; i++)
     putchar (FCHAR);
+
   printf (" %s ", carr_buff + basename (carr_buff));
-  for (i = 0;
-       i <
-       (ui_col * 3 - 2 + 2 - 1 + OFFLEN -
-	sLen (carr_buff + basename (carr_buff))) / 2; i++)
+
+  for (i = 0; i < DLENGTH; i++)
     putchar ('=');
   putchar ('\n');
 
