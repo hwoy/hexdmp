@@ -5,8 +5,10 @@
 #define COL 16
 #define BASE 16
 #define BSIZE 1024
-#define DELIM ','
+#define DELIM 0x20
 #define LEN 2
+
+#define FCHAR '='
 
 #define OFFLEN 8
 #define OFFBASE 16
@@ -15,11 +17,14 @@ static int showHelp (const char *path, const char *opt[],
 		     const char *optdes[], int ret);
 static unsigned int basename (const char *ch);
 int showErr (const char *err[], unsigned int index);
+void dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
+	       unsigned int ui_len);
+void dumpChar (char *carr_buff, unsigned int ui_col);
 
 
 enum _opt
 {
-  e_optbin, e_optoct, e_optten, e_opthex, e_optcol
+  e_optbin, e_optoct, e_optten, e_opthex, e_optascii, e_optcol
 };
 
 enum _err
@@ -29,9 +34,12 @@ enum _err
 
 
 
-static const char *cpa_opt[] = { "-b", "-o", "-t", "-h", "-c", NULL };
+static const char *cpa_opt[] = { "-b", "-o", "-t", "-h", "-a", "-c", NULL };
+
 static const char *cpa_optdes[] =
-  { "Binary show", "Octal Show", "10 base Show", "Hex Show", "Col", NULL };
+  { "Binary show", "Octal Show", "10 base Show", "Hex Show", "ASCII Show",
+  "Col -c{n} n=number of column", NULL
+};
 
 static const char *cpa_err[] =
   { "Parameter isn't an unsigned interger", "File can't be accessed", NULL };
@@ -41,10 +49,8 @@ int
 main (int argc, const char *argv[])
 {
   static char carr_buff[BSIZE];
-  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
-  unsigned int i, j;
-  int i_ch;
-  FILE *sptr_fin;
+  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag,
+    ui_asciiflag;
 
   if (argc == 1)
     {
@@ -56,6 +62,7 @@ main (int argc, const char *argv[])
   ui_col = COL;
   ui_len = LEN;
   ui_colflag = 0;
+  ui_asciiflag = 0;
 
 /******************* Parameter Operation *********************/
 
@@ -101,45 +108,28 @@ main (int argc, const char *argv[])
 	    ui_col = 16;
 	  break;
 
+	case e_optascii:
+	  ui_asciiflag = 1;
+	  break;
+
 	case e_optcol:
 	  if (!isUint (carr_buff))
 	    {
 	      fprintf (stderr, "PARAM: %s\n", carr_buff);
 	      return showErr (cpa_err, e_errpar);
 	    }
-	  ui_col = s2ui (carr_buff,10);
+	  ui_col = s2ui (carr_buff, 10);
 	  ui_colflag = 1;
 
 	  break;
 
 	case e_optother:
-	  if (!(sptr_fin = fopen (carr_buff, "rb")))
-	    {
-	      fprintf (stderr, "FILE: %s\n", carr_buff);
-	      return showErr (cpa_err, e_errfile);
-	    }
-	  i = 0;
-	  j = 0;
-	  while ((i_ch = fgetc (sptr_fin)) != EOF)
-	    {
-	      if (!((j++) % ui_col))
-		{
-		  ui2s (j - 1, carr_buff, BSIZE, OFFBASE, OFFLEN);
-		  printf ("%s: ", carr_buff);
-		}
 
-	      ui2s (i_ch, carr_buff, BSIZE, ui_base, ui_len);
-	      printf ("%s%c", carr_buff, DELIM);
-
-	      if ((ui_col) && (++i > ui_col - 1))
-		{
-		  putchar ('\n');
-		  i = 0;
-		}
-	    }
-	  putchar ('\n');
-	  fclose (sptr_fin);
-	  return 0;
+	  if (ui_asciiflag)
+	    dumpChar (carr_buff, ui_col);
+	  else
+	    dumpByte (carr_buff, ui_col, ui_base, ui_len);
+	  break;
 
 
 	}
@@ -186,4 +176,115 @@ showErr (const char *err[], unsigned int index)
 
   fprintf (stderr, "ERROR NO %u: %s\n", index, err[index]);
   return index + 1;
+}
+
+void
+dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
+	  unsigned int ui_len)
+{
+  unsigned int i, j;
+  int i_ch;
+  FILE *sptr_fin;
+  if (!(sptr_fin = fopen (carr_buff, "rb")))
+    {
+      fprintf (stderr, "FILE: %s\n", carr_buff);
+      showErr (cpa_err, e_errfile);
+      return;
+    }
+
+  for (i = 0;
+       i <
+       (ui_col * (ui_len + 1) - 2 + 2 + OFFLEN -
+	sLen (carr_buff + basename (carr_buff))) / 2; i++)
+    putchar (FCHAR);
+  printf (" %s ", carr_buff + basename (carr_buff));
+  for (i = 0;
+       i <
+       (ui_col * (ui_len + 1) - 2 + 2 + OFFLEN -
+	sLen (carr_buff + basename (carr_buff))) / 2; i++)
+    putchar ('=');
+  putchar ('\n');
+
+  i = 0;
+  j = 0;
+
+  while ((i_ch = fgetc (sptr_fin)) != EOF)
+    {
+      if (!((j++) % ui_col))
+	{
+	  ui2s (j - 1, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	  printf ("%s: ", carr_buff);
+	}
+
+      ui2s (i_ch, carr_buff, BSIZE, ui_base, ui_len);
+      printf ("%s%c", carr_buff, DELIM);
+
+      if ((ui_col) && (++i > ui_col - 1))
+	{
+	  putchar ('\n');
+	  i = 0;
+	}
+    }
+  putchar ('\n');
+  fclose (sptr_fin);
+
+}
+
+void
+dumpChar (char *carr_buff, unsigned int ui_col)
+{
+  unsigned int i, j;
+  int i_ch;
+  FILE *sptr_fin;
+  if (!(sptr_fin = fopen (carr_buff, "rb")))
+    {
+      fprintf (stderr, "FILE: %s\n", carr_buff);
+      showErr (cpa_err, e_errfile);
+      return;
+    }
+
+  for (i = 0;
+       i <
+       (ui_col * 3 - 2 + 2 - 1 + OFFLEN -
+	sLen (carr_buff + basename (carr_buff))) / 2; i++)
+    putchar (FCHAR);
+  printf (" %s ", carr_buff + basename (carr_buff));
+  for (i = 0;
+       i <
+       (ui_col * 3 - 2 + 2 - 1 + OFFLEN -
+	sLen (carr_buff + basename (carr_buff))) / 2; i++)
+    putchar ('=');
+  putchar ('\n');
+
+  i = 0;
+  j = 0;
+
+  while ((i_ch = fgetc (sptr_fin)) != EOF)
+    {
+      if (!((j++) % ui_col))
+	{
+	  ui2s (j - 1, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	  printf ("%s: ", carr_buff);
+	}
+      if (i_ch == '\r')
+	printf ("\\r%c", DELIM);
+
+      else if (i_ch == '\n')
+	printf ("\\n%c", DELIM);
+
+      else if (i_ch == '\t')
+	printf ("\\t%c", DELIM);
+
+      else
+	printf ("%c%c%c", i_ch, DELIM, DELIM);
+
+      if ((ui_col) && (++i > ui_col - 1))
+	{
+	  putchar ('\n');
+	  i = 0;
+	}
+    }
+  putchar ('\n');
+  fclose (sptr_fin);
+
 }
