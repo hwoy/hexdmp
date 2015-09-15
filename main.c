@@ -11,7 +11,7 @@
 
 #define FCHAR '='
 
-#define OFFLEN 8
+#define OFFLEN (sizeof(unsigned int)*8/4)
 #define OFFBASE 16
 
 static int showHelp (const char *path, const char *opt[],
