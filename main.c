@@ -446,14 +446,10 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
       for (l = j; (j < l + COL / 2); j++)
 	{
 
-	  if ((i_ch = fgetc (sptr_fin)) == EOF)
-	    break;
-
-
-	  if (j >= (start + length) && (length != (unsigned int) -1))
+	  if ((i_ch = fgetc (sptr_fin)) == EOF
+	      || (j >= (start + length) && (length != (unsigned int) -1)))
 	    {
-	      putchar ('\n');
-	      return;
+	      break;
 	    }
 
 	  if (!((j - start) % (COL / 2)))
@@ -489,8 +485,14 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 
       for (i = 0, l = j; j < l + COL / 2; j++)
 	{
-	  if ((i_ch = fgetc (sptr_fin)) == EOF)
-	    break;
+
+	  if ((i_ch = fgetc (sptr_fin)) == EOF
+	      || (j >= (start + length) && (length != (unsigned int) -1)))
+	    {
+	      putchar ('\n');
+	      return;
+	    }
+
 	  if ((k = findStdC (i_ch, carr_stdc)) > 0)
 	    printf ("\b\\%c%c  ", carr_stdc_str[k], DELIM);
 
@@ -507,8 +509,6 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 
     }
 
-  if (i)
-    putchar ('\n');
   fclose (sptr_fin);
 
 }
