@@ -11,3 +11,5 @@ int opt_action (int argc, const char *argv[], const char *param[], char *buff,
 int opt_getIndex (void);
 
 void opt_setIndex (int index);
+
+void opt_resetIndex(void);

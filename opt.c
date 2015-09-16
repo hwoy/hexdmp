@@ -1,7 +1,9 @@
 #include <string.h>
 #include "opt.h"
 
-static int i_upindex = -1;
+#define DINDEX -1		/*Dont Edit This value, This value must be negative */
+
+static int i_upindex = DINDEX;
 
 int
 opt_action (int argc, const char *argv[], const char *param[], char *buff,
@@ -55,4 +57,10 @@ void
 opt_setIndex (int index)
 {
   i_upindex = index;
+}
+
+void
+opt_resetIndex (void)
+{
+  i_upindex = DINDEX;
 }

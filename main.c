@@ -13,52 +13,50 @@
 
 #define OFFLEN (sizeof(unsigned int)*8/4)
 #define OFFBASE 16
-
 #define DLENGTH 2
 
 
 static int showHelp (const char *path, const char *opt[],
 		     const char *optdes[], int ret);
 static unsigned int basename (const char *ch);
-int showErr (const char *err[], unsigned int index);
-void dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
-	       unsigned int ui_len, unsigned int start, unsigned int length);
-void dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
-	       unsigned int length);
+static int showErr (const char *err[], unsigned int index);
 
-int findStdC (int ch, const char *stdc);
+static void dumpByte (char *carr_buff, unsigned int ui_col,
+		      unsigned int ui_base, unsigned int ui_len,
+		      unsigned int start, unsigned int length);
+static void dumpChar (char *carr_buff, unsigned int ui_col,
+		      unsigned int start, unsigned int length);
+static int findStdC (int ch, const char *stdc);
 
-
-enum _opt
-{
-  e_optbin, e_optoct, e_optten, e_opthex, e_optascii, e_optcol, e_optstart,
-  e_optlength
-};
-
-enum _err
-{
-  e_errpar, e_errfile, e_errzero
-};
 
 
 static const char carr_hexpref[] = "0x";
 
 
+
 static const char *cpa_opt[] =
   { "-b", "-o", "-t", "-h", "-a", "-c:", "-s:", "-l:", NULL };
-
-
+enum _opt
+{
+  e_optbin, e_optoct, e_optten, e_opthex, e_optascii, e_optcol, e_optstart,
+  e_optlength
+};
 static const char *cpa_optdes[] =
   { "Binary show", "Octal Show", "10 base Show", "Hex Show", "ASCII Show",
   "Col -c:{n} n=number of column", "-s:{n} Start to offset n",
   "-l{n} n=Length of byte for watching", NULL
 };
 
+
 static const char *cpa_err[] =
   { "Parameter isn't an unsigned interger", "File can't be accessed",
   "Column must more than 0", NULL
 };
 
+enum _err
+{
+  e_errpar, e_errfile, e_errzero
+};
 
 static const char carr_stdc[] =
   { '\0', '\a', '\b', 'f', '\n', '\r', '\t', '\v', '\0', '\0' };
@@ -243,7 +241,7 @@ basename (const char *ch)
   return (j == 0) ? 0 : j + 1;
 }
 
-int
+static int
 showErr (const char *err[], unsigned int index)
 {
 
@@ -251,7 +249,7 @@ showErr (const char *err[], unsigned int index)
   return index + 1;
 }
 
-void
+static void
 dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 	  unsigned int ui_len, unsigned int start, unsigned int length)
 {
@@ -307,7 +305,7 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 
 }
 
-void
+static void
 dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 	  unsigned int length)
 {
@@ -350,10 +348,10 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 	  printf ("%s: ", carr_buff);
 	}
       if ((k = findStdC (i_ch, carr_stdc)) > 0)
-	printf ("\\%c%c", carr_stdc_str[k], DELIM);
+	printf ("\b\\%c%c  ", carr_stdc_str[k], DELIM);
 
       else
-	printf ("%c%c%c", i_ch, DELIM, DELIM);
+	printf ("%c%c  ", i_ch, DELIM);
 
       if ((ui_col) && (++i > ui_col - 1))
 	{
@@ -366,7 +364,7 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 }
 
-int
+static int
 findStdC (int ch, const char *stdc)
 {
   int i;
