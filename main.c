@@ -470,7 +470,7 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 	  for (k = 0; k < LEN + 1; k++)
 	    printf ("%c", DELIM);
 
-      printf (carr_DSEPERATE);
+      if(length)printf (carr_DSEPERATE);
 
 
       tmp2 = ftell (sptr_fin);
