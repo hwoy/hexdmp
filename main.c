@@ -438,19 +438,17 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
   tmp1 = tmp2 = ftell (sptr_fin);
 
 
-  for (n = 0; !feof (sptr_fin); n++)
+  for (n = 0; ; n++)
     {
-      /*fseek (sptr_fin, -1L, SEEK_CUR); */
       tmp1 = ftell (sptr_fin);
       fseek (sptr_fin, tmp2, SEEK_SET);
 
 
-      for (m = j; j <= start; j++)
+      for (m = j; j < start; j++)
 	{
 	  if (fgetc (sptr_fin) == EOF)
 	    return;
 	}
-      fseek (sptr_fin, -1L, SEEK_CUR);
 
 
       for (p = 0, i_ch = 0, l = j; (j < l + ui_col); j++, p++)
@@ -474,7 +472,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 	}
 
 
-      if (!n && p < ui_col)
+      if (!n && p < ui_col && p>0)
 	printf (carr_DSEPERATE);
 
       else
@@ -500,13 +498,11 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
       tmp2 = ftell (sptr_fin);
       fseek (sptr_fin, tmp1, SEEK_SET);
 
-      for (j = m; j <= start; j++)
+      for (j = m; j < start; j++)
 	{
 	  if (fgetc (sptr_fin) == EOF)
 	    return;
 	}
-      fseek (sptr_fin, -1L, SEEK_CUR);
-
 
       for (i = 0, l = j; j < l + ui_col; j++)
 	{
