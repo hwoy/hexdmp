@@ -432,13 +432,8 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
   putchar ('\n');
 
 
-  j = 0;
-  m = 0;
 
-  tmp1 = tmp2 = ftell (sptr_fin);
-
-
-  for (n = 0; ; n++)
+  for (tmp1 = tmp2 = ftell (sptr_fin), j = 0, m = 0, n = 0;; n++)
     {
       tmp1 = ftell (sptr_fin);
       fseek (sptr_fin, tmp2, SEEK_SET);
@@ -472,7 +467,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 	}
 
 
-      if (!n && p < ui_col && p>0)
+      if (!n && p < ui_col && p > 0)
 	printf (carr_DSEPERATE);
 
       else
