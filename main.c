@@ -89,7 +89,7 @@ main (int argc, const char *argv[])
   ui_colflag = 0;
   ui_start = 0;
   ui_length = (unsigned int) -1;
-  i_actIndex = -1;
+  i_actIndex = e_opttwoside;
 
 /******************* Parameter Operation *********************/
 
@@ -109,6 +109,8 @@ main (int argc, const char *argv[])
 
 	  if (!ui_colflag)
 	    ui_col = 8;
+
+	  i_actIndex = (unsigned int) -1;
 	  break;
 
 	case e_optoct:
@@ -117,6 +119,8 @@ main (int argc, const char *argv[])
 
 	  if (!ui_colflag)
 	    ui_col = 8;
+
+	  i_actIndex = (unsigned int) -1;
 	  break;
 
 	case e_optdec:
@@ -125,6 +129,8 @@ main (int argc, const char *argv[])
 
 	  if (!ui_colflag)
 	    ui_col = 10;
+
+	  i_actIndex = (unsigned int) -1;
 	  break;
 
 	case e_opthex:
@@ -133,6 +139,8 @@ main (int argc, const char *argv[])
 
 	  if (!ui_colflag)
 	    ui_col = 16;
+
+	  i_actIndex = (unsigned int) -1;
 	  break;
 
 	case e_optascii:
@@ -162,6 +170,7 @@ main (int argc, const char *argv[])
 	      return showErr (cpa_err, e_errzero);
 	    }
 	  ui_colflag = 1;
+	  i_actIndex = (unsigned int) -1;
 
 	  break;
 
@@ -387,10 +396,11 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 }
 
+/***************************************/
 static void
 dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 {
-  unsigned int i, j, l;
+  unsigned int i, j, l, m;
   int i_ch;
   int k;
   long tmp1, tmp2;
@@ -414,20 +424,31 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 
 
   j = 0;
+  m = 0;
+
   tmp1 = tmp2 = ftell (sptr_fin);
-  while (!feof (sptr_fin))
+
+
+  while (fgetc (sptr_fin) != EOF)
     {
+      fseek (sptr_fin, -1L, SEEK_CUR);
       tmp1 = ftell (sptr_fin);
       fseek (sptr_fin, tmp2, SEEK_SET);
 
-      for (l = j; (j < l + 8); j++)
+
+      for (m = j; j < start; j++)
+	{
+	  if (fgetc (sptr_fin) == EOF)
+	    return;
+	}
+
+
+      for (l = j; (j < l + COL / 2); j++)
 	{
 
 	  if ((i_ch = fgetc (sptr_fin)) == EOF)
 	    break;
 
-	  if (j < start)
-	    continue;
 
 	  if (j >= (start + length) && (length != (unsigned int) -1))
 	    {
@@ -448,19 +469,25 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 
 
 
+      if ((j - start) % (COL / 2))
+	for (i = 0; i < ((COL / 2) - (j - start) % (COL / 2)); i++)
+	  for (k = 0; k < LEN + 1; k++)
+	    printf ("%c", DELIM);
+
+      /*if(!feof(sptr_fin)) */ printf (carr_DSEPERATE);
+
 
       tmp2 = ftell (sptr_fin);
       fseek (sptr_fin, tmp1, SEEK_SET);
 
-      for (i = 0; i < (j % (COL / 2)); i++)
-	for (k = 1; k < LEN; k++)
-	  printf ("%c", DELIM);
+      for (j = m; j < start; j++)
+	{
+	  if (fgetc (sptr_fin) == EOF)
+	    return;
+	}
 
-      printf (carr_DSEPERATE);
 
-
-
-      for (i = 0, l = j; j < l + 8; j++)
+      for (i = 0, l = j; j < l + COL / 2; j++)
 	{
 	  if ((i_ch = fgetc (sptr_fin)) == EOF)
 	    break;
@@ -478,10 +505,10 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 	}
 
 
-
-
     }
-  putchar ('\n');
+
+  if (i)
+    putchar ('\n');
   fclose (sptr_fin);
 
 }
