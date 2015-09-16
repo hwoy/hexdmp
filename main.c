@@ -15,6 +15,8 @@
 #define OFFBASE 16
 #define DLENGTH 2
 
+#define DCOLTWOSIDE 8
+
 
 static int showHelp (const char *path, const char *opt[],
 		     const char *optdes[], int ret);
@@ -212,7 +214,7 @@ main (int argc, const char *argv[])
 	  i_actIndex = e_opttwoside;
 
 	  if (!ui_colflag)
-	    ui_col = 8;
+	    ui_col = DCOLTWOSIDE;
 
 	  break;
 
