@@ -26,8 +26,8 @@ static void dumpByte (char *carr_buff, unsigned int ui_col,
 		      unsigned int start, unsigned int length);
 static void dumpChar (char *carr_buff, unsigned int ui_col,
 		      unsigned int start, unsigned int length);
-static void dumpDual (char *carr_buff, unsigned int start,
-		      unsigned int length);
+static void dumpDual (char *carr_buff, unsigned int ui_col,
+		      unsigned int start, unsigned int length);
 
 static int findStdC (int ch, const char *stdc);
 
@@ -170,7 +170,6 @@ main (int argc, const char *argv[])
 	      return showErr (cpa_err, e_errzero);
 	    }
 	  ui_colflag = 1;
-	  i_actIndex = (unsigned int) -1;
 
 	  break;
 
@@ -212,6 +211,9 @@ main (int argc, const char *argv[])
 
 	  i_actIndex = e_opttwoside;
 
+	  if (!ui_colflag)
+	    ui_col = 8;
+
 	  break;
 
 	case e_optother:
@@ -224,7 +226,7 @@ main (int argc, const char *argv[])
 	      break;
 
 	    case e_opttwoside:
-	      dumpDual (carr_buff, ui_start, ui_length);
+	      dumpDual (carr_buff, ui_col, ui_start, ui_length);
 	      break;
 
 	    default:
@@ -398,7 +400,8 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 /***************************************/
 static void
-dumpDual (char *carr_buff, unsigned int start, unsigned int length)
+dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
+	  unsigned int length)
 {
   unsigned int i, j, l, m;
   int i_ch;
@@ -443,7 +446,7 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 	}
 
 
-      for (l = j; (j < l + COL / 2); j++)
+      for (l = j; (j < l + ui_col); j++)
 	{
 
 	  if ((i_ch = fgetc (sptr_fin)) == EOF
@@ -452,7 +455,7 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 	      break;
 	    }
 
-	  if (!((j - start) % (COL / 2)))
+	  if (!((j - start) % ui_col))
 	    {
 	      ui2s (j, carr_buff, BSIZE, OFFBASE, OFFLEN);
 	      printf ("%s: ", carr_buff);
@@ -465,12 +468,13 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 
 
 
-      if ((j - start) % (COL / 2))
-	for (i = 0; i < ((COL / 2) - (j - start) % (COL / 2)); i++)
+      if ((j - start) % ui_col)
+	for (i = 0; i < (ui_col - (j - start) % ui_col); i++)
 	  for (k = 0; k < LEN + 1; k++)
 	    printf ("%c", DELIM);
 
-      if(length)printf (carr_DSEPERATE);
+      if (length)
+	printf (carr_DSEPERATE);
 
 
       tmp2 = ftell (sptr_fin);
@@ -483,7 +487,7 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 	}
 
 
-      for (i = 0, l = j; j < l + COL / 2; j++)
+      for (i = 0, l = j; j < l + ui_col; j++)
 	{
 
 	  if ((i_ch = fgetc (sptr_fin)) == EOF
@@ -499,7 +503,7 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 	  else
 	    printf ("%c%c  ", i_ch, DELIM);
 
-	  if ((COL / 2) && (++i > (COL / 2) - 1))
+	  if (ui_col && (++i > ui_col - 1))
 	    {
 	      putchar ('\n');
 	      i = 0;
@@ -513,6 +517,7 @@ dumpDual (char *carr_buff, unsigned int start, unsigned int length)
 
 }
 
+/************************************************/
 static int
 findStdC (int ch, const char *stdc)
 {
