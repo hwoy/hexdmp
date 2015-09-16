@@ -406,11 +406,14 @@ static void
 dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 	  unsigned int length)
 {
-  unsigned int i, j, l, m;
+  unsigned int i, j, l, m, n;
   int i_ch;
   int k;
   long tmp1, tmp2;
   FILE *sptr_fin;
+
+  if (!length)
+    return;
 
   if (!(sptr_fin = fopen (carr_buff, "rb")))
     {
@@ -435,7 +438,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
   tmp1 = tmp2 = ftell (sptr_fin);
 
 
-  while (fgetc (sptr_fin) != EOF)
+  for (n = 0; fgetc (sptr_fin) != EOF; n++)
     {
       fseek (sptr_fin, -1L, SEEK_CUR);
       tmp1 = ftell (sptr_fin);
@@ -469,15 +472,19 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 	}
 
+/*******************************************************/
 
 
-      if ((j - start) % ui_col)
+      if (((j - start) % ui_col) && (ui_col < length) && ((j < start + length)))
 	for (i = 0; i < (ui_col - (j - start) % ui_col); i++)
 	  for (k = 0; k < LEN + 1; k++)
 	    printf ("%c", DELIM);
 
-      if (length)
-	printf (carr_DSEPERATE);
+      printf (carr_DSEPERATE);
+
+
+/*******************************************************/
+
 
 
       tmp2 = ftell (sptr_fin);
