@@ -48,10 +48,10 @@ enum _opt
   e_optlength, e_opttwoside
 };
 static const char *cpa_optdes[] =
-  { "Binary show", "Octal Show", "10 base Show (Decimal)", "Hex Show",
-  "ASCII Show",
-  "Col -c:{n} n=number of column", "-s:{n} Start to offset n",
-  "-l{n} n=Length of byte for watching", "Dual view", NULL
+  { "-b Binary show", "-o Octal Show", "-d 10 base Show (Decimal)", "-h Hex Show",
+  "-a ASCII Show",
+  "-c:{n} n=number of column", "-s:{n} n=offset",
+  "-l:{n} n=Length", "-t Dual view", NULL
 };
 
 
