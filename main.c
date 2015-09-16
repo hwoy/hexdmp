@@ -401,12 +401,12 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 }
 
-/***************************************/
+
 static void
 dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 	  unsigned int length)
 {
-  unsigned int i, j, l, m, n;
+  unsigned int i, j, l, m, n, p;
   int i_ch;
   int k;
   long tmp1, tmp2;
@@ -438,21 +438,22 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
   tmp1 = tmp2 = ftell (sptr_fin);
 
 
-  for (n = 0; fgetc (sptr_fin) != EOF; n++)
+  for (n = 0; !feof (sptr_fin); n++)
     {
-      fseek (sptr_fin, -1L, SEEK_CUR);
+      /*fseek (sptr_fin, -1L, SEEK_CUR); */
       tmp1 = ftell (sptr_fin);
       fseek (sptr_fin, tmp2, SEEK_SET);
 
 
-      for (m = j; j < start; j++)
+      for (m = j; j <= start; j++)
 	{
 	  if (fgetc (sptr_fin) == EOF)
 	    return;
 	}
+      fseek (sptr_fin, -1L, SEEK_CUR);
 
 
-      for (l = j; (j < l + ui_col); j++)
+      for (p = 0, i_ch = 0, l = j; (j < l + ui_col); j++, p++)
 	{
 
 	  if ((i_ch = fgetc (sptr_fin)) == EOF
@@ -472,29 +473,39 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 	}
 
-/*******************************************************/
+
+      if (!n && p < ui_col)
+	printf (carr_DSEPERATE);
+
+      else
+	{
+
+	  if (((j - start) % ui_col) && (ui_col < length)
+	      && (((j < start + length) && (length != -1)) || (length == -1)))
+	    for (i = 0; i < (ui_col - (j - start) % ui_col); i++)
+	      for (k = 0; k < LEN + 1; k++)
+		printf ("%c", DELIM);
+
+	  if (p)
+	    printf (carr_DSEPERATE);
+	  else
+	    return;
 
 
-      if (((j - start) % ui_col) && (ui_col < length) && ((j < start + length)))
-	for (i = 0; i < (ui_col - (j - start) % ui_col); i++)
-	  for (k = 0; k < LEN + 1; k++)
-	    printf ("%c", DELIM);
+	}
 
-      printf (carr_DSEPERATE);
-
-
-/*******************************************************/
 
 
 
       tmp2 = ftell (sptr_fin);
       fseek (sptr_fin, tmp1, SEEK_SET);
 
-      for (j = m; j < start; j++)
+      for (j = m; j <= start; j++)
 	{
 	  if (fgetc (sptr_fin) == EOF)
 	    return;
 	}
+      fseek (sptr_fin, -1L, SEEK_CUR);
 
 
       for (i = 0, l = j; j < l + ui_col; j++)
@@ -527,7 +538,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 }
 
-/************************************************/
+
 static int
 findStdC (int ch, const char *stdc)
 {
