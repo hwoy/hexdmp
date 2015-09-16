@@ -36,7 +36,7 @@ static int findStdC (int ch, const char *stdc);
 
 
 static const char carr_hexpref[] = "0x";
-static const char carr_DSEPERATE[] = "| ";
+static const char carr_DSEPERATE[] = " | ";
 
 
 
@@ -86,7 +86,7 @@ main (int argc, const char *argv[])
 /******************* Set Default *********************/
 
   ui_base = BASE;
-  ui_col = COL;
+  ui_col = DCOLTWOSIDE;
   ui_len = LEN;
   ui_colflag = 0;
   ui_start = 0;
@@ -215,6 +215,7 @@ main (int argc, const char *argv[])
 
 	  if (!ui_colflag)
 	    ui_col = DCOLTWOSIDE;
+
 
 	  break;
 
@@ -384,10 +385,10 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 	  printf ("%s: ", carr_buff);
 	}
       if ((k = findStdC (i_ch, carr_stdc)) > 0)
-	printf ("\b\\%c%c  ", carr_stdc_str[k], DELIM);
+	printf ("\\%c%c", carr_stdc_str[k], DELIM);
 
       else
-	printf ("%c%c  ", i_ch, DELIM);
+	printf (" %c%c", i_ch, DELIM);
 
       if ((ui_col) && (++i > ui_col - 1))
 	{
@@ -500,10 +501,10 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 	    }
 
 	  if ((k = findStdC (i_ch, carr_stdc)) > 0)
-	    printf ("\b\\%c%c  ", carr_stdc_str[k], DELIM);
+	    printf ("\\%c%c", carr_stdc_str[k], DELIM);
 
 	  else
-	    printf ("%c%c  ", i_ch, DELIM);
+	    printf (" %c%c", i_ch, DELIM);
 
 	  if (ui_col && (++i > ui_col - 1))
 	    {
