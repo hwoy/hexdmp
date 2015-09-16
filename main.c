@@ -26,25 +26,30 @@ static void dumpByte (char *carr_buff, unsigned int ui_col,
 		      unsigned int start, unsigned int length);
 static void dumpChar (char *carr_buff, unsigned int ui_col,
 		      unsigned int start, unsigned int length);
+static void dumpDual (char *carr_buff, unsigned int start,
+		      unsigned int length);
+
 static int findStdC (int ch, const char *stdc);
 
 
 
 static const char carr_hexpref[] = "0x";
+static const char carr_DSEPERATE[] = "| ";
 
 
 
 static const char *cpa_opt[] =
-  { "-b", "-o", "-t", "-h", "-a", "-c:", "-s:", "-l:", NULL };
+  { "-b", "-o", "-d", "-h", "-a", "-c:", "-s:", "-l:", "-t", NULL };
 enum _opt
 {
-  e_optbin, e_optoct, e_optten, e_opthex, e_optascii, e_optcol, e_optstart,
-  e_optlength
+  e_optbin, e_optoct, e_optdec, e_opthex, e_optascii, e_optcol, e_optstart,
+  e_optlength, e_opttwoside
 };
 static const char *cpa_optdes[] =
-  { "Binary show", "Octal Show", "10 base Show", "Hex Show", "ASCII Show",
+  { "Binary show", "Octal Show", "10 base Show (Decimal)", "Hex Show",
+  "ASCII Show",
   "Col -c:{n} n=number of column", "-s:{n} Start to offset n",
-  "-l{n} n=Length of byte for watching", NULL
+  "-l{n} n=Length of byte for watching", "Dual view", NULL
 };
 
 
@@ -68,8 +73,9 @@ main (int argc, const char *argv[])
 {
   static char carr_buff[BSIZE];
   unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag,
-    ui_asciiflag, ui_start, ui_length;
+    ui_start, ui_length;
   unsigned int i;
+  int i_actIndex;
 
   if (argc == 1)
     {
@@ -81,9 +87,9 @@ main (int argc, const char *argv[])
   ui_col = COL;
   ui_len = LEN;
   ui_colflag = 0;
-  ui_asciiflag = 0;
   ui_start = 0;
   ui_length = (unsigned int) -1;
+  i_actIndex = -1;
 
 /******************* Parameter Operation *********************/
 
@@ -113,7 +119,7 @@ main (int argc, const char *argv[])
 	    ui_col = 8;
 	  break;
 
-	case e_optten:
+	case e_optdec:
 	  ui_base = 10;
 	  ui_len = 3;
 
@@ -130,7 +136,7 @@ main (int argc, const char *argv[])
 	  break;
 
 	case e_optascii:
-	  ui_asciiflag = 1;
+	  i_actIndex = e_optascii;
 	  break;
 
 	case e_optcol:
@@ -193,13 +199,30 @@ main (int argc, const char *argv[])
 
 	  break;
 
+	case e_opttwoside:
+
+	  i_actIndex = e_opttwoside;
+
+	  break;
+
 	case e_optother:
 
-	  if (ui_asciiflag)
-	    dumpChar (carr_buff, ui_col, ui_start, ui_length);
-	  else
-	    dumpByte (carr_buff, ui_col, ui_base, ui_len, ui_start,
-		      ui_length);
+	  switch (i_actIndex)
+	    {
+
+	    case e_optascii:
+	      dumpChar (carr_buff, ui_col, ui_start, ui_length);
+	      break;
+
+	    case e_opttwoside:
+	      dumpDual (carr_buff, ui_start, ui_length);
+	      break;
+
+	    default:
+	      dumpByte (carr_buff, ui_col, ui_base, ui_len, ui_start,
+			ui_length);
+	    }
+
 	  break;
 
 
@@ -246,7 +269,7 @@ showErr (const char *err[], unsigned int index)
 {
 
   fprintf (stderr, "ERROR NO %u: %s\n", index, err[index]);
-  return index + 1;
+  return -1 * (++index);
 }
 
 static void
@@ -358,6 +381,105 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 	  putchar ('\n');
 	  i = 0;
 	}
+    }
+  putchar ('\n');
+  fclose (sptr_fin);
+
+}
+
+static void
+dumpDual (char *carr_buff, unsigned int start, unsigned int length)
+{
+  unsigned int i, j, l;
+  int i_ch;
+  int k;
+  long tmp1, tmp2;
+  FILE *sptr_fin;
+
+  if (!(sptr_fin = fopen (carr_buff, "rb")))
+    {
+      fprintf (stderr, "FILE: %s\n", carr_buff);
+      showErr (cpa_err, e_errfile);
+      return;
+    }
+
+  for (i = 0; i < DLENGTH; i++)
+    putchar (FCHAR);
+
+  printf (" %s ", carr_buff + basename (carr_buff));
+
+  for (i = 0; i < DLENGTH; i++)
+    putchar ('=');
+  putchar ('\n');
+
+
+  j = 0;
+  tmp1 = tmp2 = ftell (sptr_fin);
+  while (!feof (sptr_fin))
+    {
+      tmp1 = ftell (sptr_fin);
+      fseek (sptr_fin, tmp2, SEEK_SET);
+
+      for (l = j; (j < l + 8); j++)
+	{
+
+	  if ((i_ch = fgetc (sptr_fin)) == EOF)
+	    break;
+
+	  if (j < start)
+	    continue;
+
+	  if (j >= (start + length) && (length != (unsigned int) -1))
+	    {
+	      putchar ('\n');
+	      return;
+	    }
+
+	  if (!((j - start) % (COL / 2)))
+	    {
+	      ui2s (j, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	      printf ("%s: ", carr_buff);
+	    }
+
+	  ui2s (i_ch, carr_buff, BSIZE, BASE, LEN);
+	  printf ("%s%c", carr_buff, DELIM);
+
+	}
+
+
+
+
+      tmp2 = ftell (sptr_fin);
+      fseek (sptr_fin, tmp1, SEEK_SET);
+
+      for (i = 0; i < (j % (COL / 2)); i++)
+	for (k = 1; k < LEN; k++)
+	  printf ("%c", DELIM);
+
+      printf (carr_DSEPERATE);
+
+
+
+      for (i = 0, l = j; j < l + 8; j++)
+	{
+	  if ((i_ch = fgetc (sptr_fin)) == EOF)
+	    break;
+	  if ((k = findStdC (i_ch, carr_stdc)) > 0)
+	    printf ("\b\\%c%c  ", carr_stdc_str[k], DELIM);
+
+	  else
+	    printf ("%c%c  ", i_ch, DELIM);
+
+	  if ((COL / 2) && (++i > (COL / 2) - 1))
+	    {
+	      putchar ('\n');
+	      i = 0;
+	    }
+	}
+
+
+
+
     }
   putchar ('\n');
   fclose (sptr_fin);
