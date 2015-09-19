@@ -48,7 +48,8 @@ enum _opt
   e_optlength, e_opttwoside
 };
 static const char *cpa_optdes[] =
-  { "-b Binary show", "-o Octal Show", "-d 10 base Show (Decimal)", "-h Hex Show",
+  { "-b Binary show", "-o Octal Show", "-d 10 base Show (Decimal)",
+"-h Hex Show",
   "-a ASCII Show",
   "-c:{n} n=number of column", "-s:{n} n=offset",
   "-l:{n} n=Length", "-t Dual view", NULL
@@ -300,6 +301,7 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
       return;
     }
 
+
   for (i = 0; i < DLENGTH; i++)
     putchar (FCHAR);
 
@@ -309,22 +311,22 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
     putchar ('=');
   putchar ('\n');
 
+  if (fseek (sptr_fin, start, SEEK_SET) < 0)
+    return;
 
   for (i = 0, j = 0; (i_ch = fgetc (sptr_fin)) != EOF; j++)
     {
 
-      if (j < start)
-	continue;
 
-      if (j >= (start + length) && (length != (unsigned int) -1))
+      if (j >= (length) && (length != (unsigned int) -1))
 	{
 	  putchar ('\n');
 	  return;
 	}
 
-      if (!((j - start) % ui_col))
+      if (!(j % ui_col))
 	{
-	  ui2s (j, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	  ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 	  printf ("%s: ", carr_buff);
 	}
 
@@ -367,21 +369,20 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
     putchar ('=');
   putchar ('\n');
 
+  if (fseek (sptr_fin, start, SEEK_SET) < 0)
+    return;
 
   for (i = 0, j = 0; (i_ch = fgetc (sptr_fin)) != EOF; j++)
     {
 
-      if (j < start)
-	continue;
-
-      if (j >= (start + length) && (length != (unsigned int) -1))
+      if ((j >= length) && (length != (unsigned int) -1))
 	{
 	  putchar ('\n');
 	  return;
 	}
-      if (!((j - start) % ui_col))
+      if (!(j % ui_col))
 	{
-	  ui2s (j, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	  ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 	  printf ("%s: ", carr_buff);
 	}
       if ((k = findStdC (i_ch, carr_stdc)) > 0)
@@ -406,7 +407,7 @@ static void
 dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 	  unsigned int length)
 {
-  unsigned int i, j, l, m, n, p;
+  unsigned int i, j, n, p, l, m;
   int i_ch;
   int k;
   long tmp1, tmp2;
@@ -432,6 +433,8 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
   putchar ('\n');
 
 
+  if (fseek (sptr_fin, start, SEEK_SET) < 0)
+    return;
 
   for (tmp1 = tmp2 = ftell (sptr_fin), j = 0, m = 0, n = 0;; n++)
     {
@@ -439,25 +442,19 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
       fseek (sptr_fin, tmp2, SEEK_SET);
 
 
-      for (m = j; j < start; j++)
-	{
-	  if (fgetc (sptr_fin) == EOF)
-	    return;
-	}
 
-
-      for (p = 0, i_ch = 0, l = j; (j < l + ui_col); j++, p++)
+      for (m = j, p = 0, i_ch = 0, l = j; (j < l + ui_col); j++, p++)
 	{
 
 	  if ((i_ch = fgetc (sptr_fin)) == EOF
-	      || (j >= (start + length) && (length != (unsigned int) -1)))
+	      || (j >= length && (length != (unsigned int) -1)))
 	    {
 	      break;
 	    }
 
-	  if (!((j - start) % ui_col))
+	  if (!(j % ui_col))
 	    {
-	      ui2s (j, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	      ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 	      printf ("%s: ", carr_buff);
 	    }
 
@@ -473,9 +470,9 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
       else
 	{
 
-	  if (((j - start) % ui_col) && (ui_col < length)
-	      && (((j < start + length) && (length != -1)) || (length == -1)))
-	    for (i = 0; i < (ui_col - (j - start) % ui_col); i++)
+	  if ((j % ui_col) && (ui_col < length)
+	      && (((j < length) && (length != -1)) || (length == -1)))
+	    for (i = 0; i < (ui_col - j % ui_col); i++)
 	      for (k = 0; k < LEN + 1; k++)
 		printf ("%c", DELIM);
 
@@ -489,21 +486,15 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 
 
-
       tmp2 = ftell (sptr_fin);
       fseek (sptr_fin, tmp1, SEEK_SET);
 
-      for (j = m; j < start; j++)
-	{
-	  if (fgetc (sptr_fin) == EOF)
-	    return;
-	}
 
-      for (i = 0, l = j; j < l + ui_col; j++)
+      for (j = m, i = 0, l = j; j < l + ui_col; j++)
 	{
 
 	  if ((i_ch = fgetc (sptr_fin)) == EOF
-	      || (j >= (start + length) && (length != (unsigned int) -1)))
+	      || (j >= length && (length != (unsigned int) -1)))
 	    {
 	      putchar ('\n');
 	      return;
