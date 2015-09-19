@@ -75,8 +75,9 @@ int
 main (int argc, const char *argv[])
 {
   static char carr_buff[BSIZE];
-  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
-  unsigned long ui_start, ui_length;
+  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag,
+    ui_length;
+  unsigned long ui_start;
   unsigned int i;
   int i_actIndex;
 
