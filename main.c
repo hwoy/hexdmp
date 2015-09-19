@@ -25,11 +25,11 @@ static int showErr (const char *err[], unsigned int index);
 
 static void dumpByte (char *carr_buff, unsigned int ui_col,
 		      unsigned int ui_base, unsigned int ui_len,
-		      unsigned long start, unsigned int length);
+		      unsigned long start, unsigned long length);
 static void dumpChar (char *carr_buff, unsigned int ui_col,
-		      unsigned long start, unsigned int length);
+		      unsigned long start, unsigned long length);
 static void dumpDual (char *carr_buff, unsigned int ui_col,
-		      unsigned long start, unsigned int length);
+		      unsigned long start, unsigned long length);
 
 static int findStdC (int ch, const char *stdc);
 
@@ -75,9 +75,8 @@ int
 main (int argc, const char *argv[])
 {
   static char carr_buff[BSIZE];
-  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag,
-    ui_length;
-  unsigned long ui_start;
+  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
+  unsigned long ui_start, ui_length;
   unsigned int i;
   int i_actIndex;
 
@@ -210,8 +209,13 @@ main (int argc, const char *argv[])
 	  i =
 	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
 	    10;
+#ifdef _DOS_
+	  ui_length =
+	    s2uL (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
+#else
 	  ui_length =
 	    s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
+#endif
 
 	  break;
 
@@ -294,7 +298,7 @@ showErr (const char *err[], unsigned int index)
 
 static void
 dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
-	  unsigned int ui_len, unsigned long start, unsigned int length)
+	  unsigned int ui_len, unsigned long start, unsigned long length)
 {
   unsigned int i;
   unsigned long j;
@@ -356,7 +360,7 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 
 static void
 dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
-	  unsigned int length)
+	  unsigned long length)
 {
   unsigned int i;
   unsigned long j;
@@ -420,7 +424,7 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
 
 static void
 dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
-	  unsigned int length)
+	  unsigned long length)
 {
   unsigned int i, n, p, l, m;
   unsigned long j;
