@@ -295,7 +295,8 @@ static void
 dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 	  unsigned int ui_len, unsigned long start, unsigned int length)
 {
-  unsigned int i, j;
+  unsigned int i;
+  unsigned long j;
   int i_ch;
   FILE *sptr_fin;
   if (!(sptr_fin = fopen (carr_buff, "rb")))
@@ -356,7 +357,8 @@ static void
 dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
 	  unsigned int length)
 {
-  unsigned int i, j;
+  unsigned int i;
+  unsigned long j;
   int i_ch;
   int k;
   FILE *sptr_fin;
@@ -419,7 +421,8 @@ static void
 dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
 	  unsigned int length)
 {
-  unsigned int i, j, n, p, l, m;
+  unsigned int i, n, p, l, m;
+  unsigned long j;
   int i_ch;
   int k;
   long tmp1, tmp2;
