@@ -413,9 +413,6 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
   long tmp1, tmp2;
   FILE *sptr_fin;
 
-  if (!length)
-    return;
-
   if (!(sptr_fin = fopen (carr_buff, "rb")))
     {
       fprintf (stderr, "FILE: %s\n", carr_buff);
