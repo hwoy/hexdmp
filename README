@@ -1,6 +1,4 @@
 hexdmp is an alternative cross-compile capable HEXDUMP software
 
-if you would to compile it for 16 bits DOS,
-**** You must converse any variable type ( form unsigned int(16 bits) to long(32 bits)) ****
-such as  length & start variable for fseek function
+
 Thank!

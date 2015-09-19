@@ -1,6 +1,6 @@
 cc = gcc
 bin = hexdmp
-CFLAGS =  -O2  -ansi -Wpedantic -Wall -Werror
+CFLAGS =  -O2  -ansi -Wpedantic -Wall -Werror #-D_DOS_
 
 .PHONY: all clean
 

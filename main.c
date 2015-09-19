@@ -25,11 +25,11 @@ static int showErr (const char *err[], unsigned int index);
 
 static void dumpByte (char *carr_buff, unsigned int ui_col,
 		      unsigned int ui_base, unsigned int ui_len,
-		      unsigned int start, unsigned int length);
+		      unsigned long start, unsigned int length);
 static void dumpChar (char *carr_buff, unsigned int ui_col,
-		      unsigned int start, unsigned int length);
+		      unsigned long start, unsigned int length);
 static void dumpDual (char *carr_buff, unsigned int ui_col,
-		      unsigned int start, unsigned int length);
+		      unsigned long start, unsigned int length);
 
 static int findStdC (int ch, const char *stdc);
 
@@ -49,7 +49,7 @@ enum _opt
 };
 static const char *cpa_optdes[] =
   { "-b Binary show", "-o Octal Show", "-d 10 base Show (Decimal)",
-"-h Hex Show",
+  "-h Hex Show",
   "-a ASCII Show",
   "-c:{n} n=number of column", "-s:{n} n=offset",
   "-l:{n} n=Length", "-t Dual view", NULL
@@ -75,8 +75,8 @@ int
 main (int argc, const char *argv[])
 {
   static char carr_buff[BSIZE];
-  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag,
-    ui_start, ui_length;
+  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
+  unsigned long ui_start, ui_length;
   unsigned int i;
   int i_actIndex;
 
@@ -188,9 +188,13 @@ main (int argc, const char *argv[])
 	  i =
 	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
 	    10;
+#ifdef _DOS_
+	  ui_start =
+	    s2uL (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
+#else
 	  ui_start =
 	    s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
-
+#endif
 	  break;
 
 	case e_optlength:
@@ -289,7 +293,7 @@ showErr (const char *err[], unsigned int index)
 
 static void
 dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
-	  unsigned int ui_len, unsigned int start, unsigned int length)
+	  unsigned int ui_len, unsigned long start, unsigned int length)
 {
   unsigned int i, j;
   int i_ch;
@@ -326,7 +330,11 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 
       if (!(j % ui_col))
 	{
+#ifdef _DOS_
+	  uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+#else
 	  ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+#endif
 	  printf ("%s: ", carr_buff);
 	}
 
@@ -345,7 +353,7 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 }
 
 static void
-dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
+dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
 	  unsigned int length)
 {
   unsigned int i, j;
@@ -382,7 +390,11 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 	}
       if (!(j % ui_col))
 	{
+#ifdef _DOS_
+	  uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+#else
 	  ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+#endif
 	  printf ("%s: ", carr_buff);
 	}
       if ((k = findStdC (i_ch, carr_stdc)) > 0)
@@ -404,7 +416,7 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 
 static void
-dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
+dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
 	  unsigned int length)
 {
   unsigned int i, j, n, p, l, m;
@@ -451,7 +463,11 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned int start,
 
 	  if (!(j % ui_col))
 	    {
+#ifdef _DOS_
+	      uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+#else
 	      ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+#endif
 	      printf ("%s: ", carr_buff);
 	    }
 
