@@ -492,7 +492,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
 	{
 
 	  if ((j % ui_col) && (ui_col < length)
-	      && (((j < length) && (length != -1)) || (length == -1)))
+	      && (((j <= length) && (length != -1)) || (length == -1)))
 	    for (i = 0; i < (ui_col - j % ui_col); i++)
 	      for (k = 0; k < LEN + 1; k++)
 		printf ("%c", DELIM);
