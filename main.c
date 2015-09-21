@@ -11,7 +11,7 @@
 
 #define FCHAR '='
 
-#define OFFLEN (sizeof(unsigned int)*8/4)
+#define OFFLEN (sizeof(unsigned long)*8/4)
 #define OFFBASE 16
 #define DLENGTH 2
 
