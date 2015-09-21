@@ -12,4 +12,4 @@ int opt_getIndex (void);
 
 void opt_setIndex (int index);
 
-void opt_resetIndex(void);
+void opt_resetIndex (void);

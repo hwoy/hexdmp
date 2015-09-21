@@ -190,7 +190,7 @@ main (int argc, const char *argv[])
 	    10;
 
 	  ui_start =
-	    s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
+	    s2uL (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
 
 	  break;
 
@@ -208,7 +208,7 @@ main (int argc, const char *argv[])
 	    10;
 
 	  ui_length =
-	    s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
+	    s2uL (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
 
 	  break;
 
@@ -330,7 +330,7 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
       if (!(j % ui_col))
 	{
 
-	  ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	  uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
 	  printf ("%s: ", carr_buff);
 	}
@@ -389,7 +389,7 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
       if (!(j % ui_col))
 	{
 
-	  ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	  uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
 	  printf ("%s: ", carr_buff);
 	}
@@ -461,7 +461,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
 	  if (!(j % ui_col))
 	    {
 
-	      ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+	      uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
 	      printf ("%s: ", carr_buff);
 	    }
