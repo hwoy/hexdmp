@@ -188,13 +188,10 @@ main (int argc, const char *argv[])
 	  i =
 	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
 	    10;
-#ifdef _DOS_
-	  ui_start =
-	    s2uL (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
-#else
+
 	  ui_start =
 	    s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
-#endif
+
 	  break;
 
 	case e_optlength:
@@ -209,13 +206,9 @@ main (int argc, const char *argv[])
 	  i =
 	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
 	    10;
-#ifdef _DOS_
-	  ui_length =
-	    s2uL (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
-#else
+
 	  ui_length =
 	    s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
-#endif
 
 	  break;
 
@@ -336,11 +329,9 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 
       if (!(j % ui_col))
 	{
-#ifdef _DOS_
-	  uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-#else
+
 	  ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-#endif
+
 	  printf ("%s: ", carr_buff);
 	}
 
@@ -397,11 +388,9 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
 	}
       if (!(j % ui_col))
 	{
-#ifdef _DOS_
-	  uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-#else
+
 	  ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-#endif
+
 	  printf ("%s: ", carr_buff);
 	}
       if ((k = findStdC (i_ch, carr_stdc)) > 0)
@@ -471,11 +460,9 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
 
 	  if (!(j % ui_col))
 	    {
-#ifdef _DOS_
-	      uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-#else
+
 	      ui2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-#endif
+
 	      printf ("%s: ", carr_buff);
 	    }
 
