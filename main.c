@@ -393,7 +393,7 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
 
 	  printf ("%s: ", carr_buff);
 	}
-      if ((k = findStdC (i_ch, carr_stdc)) > 0)
+      if ((k = findStdC (i_ch, carr_stdc)) > -1)
 	printf ("\\%c%c", carr_stdc_str[k], DELIM);
 
       else
@@ -508,7 +508,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
 	      return;
 	    }
 
-	  if ((k = findStdC (i_ch, carr_stdc)) > 0)
+	  if ((k = findStdC (i_ch, carr_stdc)) > -1)
 	    printf ("\\%c%c", carr_stdc_str[k], DELIM);
 
 	  else
