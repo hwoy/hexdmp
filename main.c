@@ -67,7 +67,7 @@ enum _err
 };
 
 static const char carr_stdc[] =
-  { '\0', '\a', '\b', 'f', '\n', '\r', '\t', '\v', '\0', '\0' };
+  { '\0', '\a', '\b', '\f', '\n', '\r', '\t', '\v', '\0', '\0' };
 static const char carr_stdc_str[] =
   { '0', 'a', 'b', 'f', 'n', 'r', 't', 'v', '\0' };
 
