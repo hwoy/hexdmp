@@ -1,4 +1,4 @@
-cc = gcc
+cc = $(CC)
 bin = hexdmp
 CFLAGS =  -O2  -ansi -Wpedantic -Wall -Werror #-D_DOS_
 
