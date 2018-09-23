@@ -20,7 +20,7 @@
 static void printoutheader(char *carr_buff,int fchar,unsigned int length);
 static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret);
-static unsigned int
+static const char *
 basename(const char* ch);
 static int
 showErr(const char* err[], unsigned int index);
@@ -242,7 +242,7 @@ static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret)
 {
     unsigned int i;
-    fprintf(stderr, "\nUSAGE: %s {option} file\n\n", path + basename(path));
+    fprintf(stderr, "\nUSAGE: %s {option} file\n\n", basename(path));
 
     fprintf(stderr, "OPTIONS\n");
     for (i = 0; opt[i] && optdes[i]; i++) {
@@ -253,11 +253,11 @@ showHelp(const char* path, const char* opt[], const char* optdes[], int ret)
     return ret;
 }
 
-static unsigned int
+static const char *
 basename(const char* ch)
 {
-    unsigned int i, j;
-    for (i = 0, j = 0; ch[i]; i++) if (ch[i] == '\\' || ch[i] == '/') j = i+1;
+    const char *j;
+    for (j=ch; *ch; ++ch) if (*ch == '\\' || *ch == '/') j = ch+1;
 
     return j;
 }
@@ -446,7 +446,7 @@ static void printoutheader(char *carr_buff,int fchar,unsigned int length)
     for (i = 0; i < length; i++)
         putchar(fchar);
 
-    printf(" %s ", carr_buff + basename(carr_buff));
+    printf(" %s ", basename(carr_buff));
 
     for (i = 0; i < length; i++)
         putchar('=');
