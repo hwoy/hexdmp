@@ -249,10 +249,10 @@ basename(const char* ch)
     unsigned int i, j;
     for (i = 0, j = 0; ch[i]; i++) {
         if (ch[i] == '\\' || ch[i] == '/') {
-            j = i;
+            j = i+1;
         }
     }
-    return (j == 0) ? 0 : j + 1;
+    return j;
 }
 
 static int
