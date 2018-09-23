@@ -305,10 +305,9 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
         ui2s(i_ch, carr_buff, BSIZE, ui_base, ui_len);
         printf("%s%c", carr_buff, DELIM);
 
-        if ((ui_col) && (++i > ui_col - 1)) {
+        if (!(i=(i+1)%ui_col))
             putchar('\n');
-            i = 0;
-        }
+
     }
     putchar('\n');
 }
@@ -346,10 +345,8 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
         else
             printf(" %c%c", i_ch, DELIM);
 
-        if ((ui_col) && (++i > ui_col - 1)) {
+        if (!(i=(i+1)%ui_col))
             putchar('\n');
-            i = 0;
-        }
     }
     putchar('\n');
 }
@@ -421,10 +418,8 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
             else
                 printf(" %c%c", i_ch, DELIM);
 
-            if (ui_col && (++i > ui_col - 1)) {
-                putchar('\n');
-                i = 0;
-            }
+			if (!(i=(i+1)%ui_col))
+				putchar('\n');
         }
     }
 
