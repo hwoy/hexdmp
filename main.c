@@ -11,7 +11,7 @@
 
 #define FCHAR '='
 
-#define OFFLEN (sizeof(unsigned long)*8/4)
+#define OFFLEN (sizeof(size_t)*8/4)
 #define OFFBASE 16
 #define DLENGTH 2
 
@@ -25,11 +25,11 @@ static int showErr (const char *err[], unsigned int index);
 
 static void dumpByte (char *carr_buff, unsigned int ui_col,
 		      unsigned int ui_base, unsigned int ui_len,
-		      unsigned long start, unsigned long length);
+		      size_t start, size_t length);
 static void dumpChar (char *carr_buff, unsigned int ui_col,
-		      unsigned long start, unsigned long length);
+		      size_t start, size_t length);
 static void dumpDual (char *carr_buff, unsigned int ui_col,
-		      unsigned long start, unsigned long length);
+		      size_t start, size_t length);
 
 static int findStdC (int ch, const char *stdc);
 
@@ -76,7 +76,7 @@ main (int argc, const char *argv[])
 {
   static char carr_buff[BSIZE];
   unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
-  unsigned long ui_start, ui_length;
+  size_t ui_start, ui_length;
   unsigned int i;
   int i_actIndex;
 
@@ -91,7 +91,7 @@ main (int argc, const char *argv[])
   ui_len = LEN;
   ui_colflag = 0;
   ui_start = 0;
-  ui_length = (unsigned int) -1;
+  ui_length = -1;
   i_actIndex = e_opttwoside;
 
 /******************* Parameter Operation *********************/
@@ -113,7 +113,7 @@ main (int argc, const char *argv[])
 	  if (!ui_colflag)
 	    ui_col = 8;
 
-	  i_actIndex = (unsigned int) -1;
+	  i_actIndex = -1;
 	  break;
 
 	case e_optoct:
@@ -123,7 +123,7 @@ main (int argc, const char *argv[])
 	  if (!ui_colflag)
 	    ui_col = 8;
 
-	  i_actIndex = (unsigned int) -1;
+	  i_actIndex = -1;
 	  break;
 
 	case e_optdec:
@@ -133,7 +133,7 @@ main (int argc, const char *argv[])
 	  if (!ui_colflag)
 	    ui_col = 10;
 
-	  i_actIndex = (unsigned int) -1;
+	  i_actIndex = -1;
 	  break;
 
 	case e_opthex:
@@ -143,7 +143,7 @@ main (int argc, const char *argv[])
 	  if (!ui_colflag)
 	    ui_col = 16;
 
-	  i_actIndex = (unsigned int) -1;
+	  i_actIndex = -1;
 	  break;
 
 	case e_optascii:
@@ -291,10 +291,10 @@ showErr (const char *err[], unsigned int index)
 
 static void
 dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
-	  unsigned int ui_len, unsigned long start, unsigned long length)
+	  unsigned int ui_len, size_t start, size_t length)
 {
   unsigned int i;
-  unsigned long j;
+  size_t j;
   int i_ch;
   FILE *sptr_fin;
   if (!(sptr_fin = fopen (carr_buff, "rb")))
@@ -321,7 +321,7 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
     {
 
 
-      if (j >= (length) && (length != (unsigned int) -1))
+      if (j >= (length) && (length != -1))
 	{
 	  putchar ('\n');
 	  return;
@@ -350,11 +350,11 @@ dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
 }
 
 static void
-dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
-	  unsigned long length)
+dumpChar (char *carr_buff, unsigned int ui_col, size_t start,
+	  size_t length)
 {
   unsigned int i;
-  unsigned long j;
+  size_t j;
   int i_ch;
   int k;
   FILE *sptr_fin;
@@ -381,7 +381,7 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
   for (i = 0, j = 0; (i_ch = fgetc (sptr_fin)) != EOF; j++)
     {
 
-      if ((j >= length) && (length != (unsigned int) -1))
+      if ((j >= length) && (length != -1))
 	{
 	  putchar ('\n');
 	  return;
@@ -412,11 +412,11 @@ dumpChar (char *carr_buff, unsigned int ui_col, unsigned long start,
 
 
 static void
-dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
-	  unsigned long length)
+dumpDual (char *carr_buff, unsigned int ui_col, size_t start,
+	  size_t length)
 {
   unsigned int i, n, p, l, m;
-  unsigned long j;
+  size_t j;
   int i_ch;
   int k;
   long tmp1, tmp2;
@@ -453,7 +453,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
 	{
 
 	  if ((i_ch = fgetc (sptr_fin)) == EOF
-	      || (j >= length && (length != (unsigned int) -1)))
+	      || (j >= length && (length != -1)))
 	    {
 	      break;
 	    }
@@ -502,7 +502,7 @@ dumpDual (char *carr_buff, unsigned int ui_col, unsigned long start,
 	{
 
 	  if ((i_ch = fgetc (sptr_fin)) == EOF
-	      || (j >= length && (length != (unsigned int) -1)))
+	      || (j >= length && (length != -1)))
 	    {
 	      putchar ('\n');
 	      return;
