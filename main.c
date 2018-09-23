@@ -181,7 +181,7 @@ int main(int argc, const char* argv[])
             }
             i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-            ui_start = sT2s(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
+            ui_start = s2sT(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
             break;
 
@@ -192,7 +192,7 @@ int main(int argc, const char* argv[])
             }
             i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-            ui_length = sT2s(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
+            ui_length = s2sT(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
             break;
 

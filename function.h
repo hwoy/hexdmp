@@ -31,8 +31,14 @@ unsigned
 isUintHex(const char*);
 
 size_t
+pow2sT(unsigned int base, unsigned int pow);
+
+size_t
 sT2s(size_t num,
     char* buff,
     unsigned int bsize,
     unsigned int base,
     unsigned int len);
+
+size_t
+s2sT(const char*, unsigned int);

@@ -235,3 +235,41 @@ sT2s(size_t num,
 
     return l;
 }
+
+size_t
+pow2sT(unsigned int base, unsigned int pow)
+{
+    unsigned int i;
+	size_t j;
+    if (!base)
+        return 0;
+    if (!pow)
+        return 1;
+    for (i = 1, j = base; i < pow; i++) {
+        j = j * base;
+    }
+    return j;
+}
+
+size_t
+s2sT(const char* ch, unsigned int base)
+{
+    size_t i, j, l;
+	unsigned int k;
+    j = 0;
+    k = 0;
+    i = sLen(ch) - 1;
+    do {
+        if (base == 16) {
+            l = (((ch[i] >= 'A' && ch[i] <= 'F') ? (ch[i] - 'A' + 10) : (ch[i] - '0')));
+
+            j += l * pow2sT(base, k++);
+        }
+
+        else {
+            j += (ch[i] - '0') * pow2sT(base, k++);
+        }
+    } while (i-- != 0);
+
+    return j;
+}

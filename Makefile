@@ -1,6 +1,6 @@
 cc = gcc
 bin = hexdmp
-CFLAGS =  -O2  -ansi -Wpedantic -Wall -Werror #-D_DOS_
+CFLAGS =  -O2  -ansi -pedantic -Wall -Werror #-D_DOS_
 
 .PHONY: all clean
 
@@ -15,5 +15,5 @@ function.o:
 opt.o:
 	$(cc) -c -o opt.o $(CFLAGS) opt.c
 clean:
-	rm -rf *.o $(bin) *~
+	rm -rf *.o $(bin) *~ *.exe
 
