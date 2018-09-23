@@ -1,4 +1,4 @@
-#include <stddef.h>
+#include <stdio.h>
 
 unsigned int
 ui2s(unsigned int num,
@@ -29,6 +29,19 @@ sLen(const char*);
 
 unsigned
 isUintHex(const char*);
+
+fpos_t
+pow2fpos(unsigned int base, unsigned int pow);
+
+fpos_t
+fpos2s(fpos_t num,
+    char* buff,
+    unsigned int bsize,
+    unsigned int base,
+    unsigned int len);
+
+fpos_t
+s2fpos(const char*, unsigned int);
 
 size_t
 pow2sT(unsigned int base, unsigned int pow);
