@@ -218,3 +218,50 @@ s2uL (const char *ch, unsigned int base)
 
   return j;
 }
+
+
+size_t sT2s (size_t num, char *buff, unsigned int bsize,
+		    unsigned int base, unsigned int len)
+{
+  size_t i, j, k;
+  size_t l;
+  char chb, che;
+  if (!base)
+    {
+      buff[0] = 0;
+      return 0;
+    }
+
+  j = num, i = 0;
+  do
+    {
+      k = j % base;
+      j /= base;
+      buff[i++] = ((base == 16) && (k > 9)) ? k + 'A' - 10 : k + '0';
+    }
+  while (j > 0 && i < bsize);
+
+  for (; i < len; i++)
+    {
+      buff[i] = '0';
+    }
+
+  l = i;
+  buff[i] = 0;
+
+
+  if (i > 0)
+    {
+      chb = buff[0];
+      che = buff[i - 1];
+      for (j = 0, i--; j < i; j++, i--)
+	{
+	  chb = buff[j];
+	  che = buff[i];
+	  buff[j] = che;
+	  buff[i] = chb;
+	}
+    }
+
+  return l;
+}

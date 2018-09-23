@@ -1,7 +1,7 @@
+#include "function.h"
+#include "opt.h"
 #include <stdio.h>
 #include <string.h>
-#include "opt.h"
-#include "function.h"
 
 #define COL 16
 #define BASE 16
@@ -11,533 +11,460 @@
 
 #define FCHAR '='
 
-#define OFFLEN (sizeof(size_t)*8/4)
+#define OFFLEN (sizeof(size_t) * 8 / 4)
 #define OFFBASE 16
 #define DLENGTH 2
 
 #define DCOLTWOSIDE 8
 
+static int showHelp(const char* path, const char* opt[],
+    const char* optdes[], int ret);
+static unsigned int basename(const char* ch);
+static int showErr(const char* err[], unsigned int index);
 
-static int showHelp (const char *path, const char *opt[],
-		     const char *optdes[], int ret);
-static unsigned int basename (const char *ch);
-static int showErr (const char *err[], unsigned int index);
+static void dumpByte(char* carr_buff, unsigned int ui_col,
+    unsigned int ui_base, unsigned int ui_len,
+    size_t start, size_t length);
+static void dumpChar(char* carr_buff, unsigned int ui_col,
+    size_t start, size_t length);
+static void dumpDual(char* carr_buff, unsigned int ui_col,
+    size_t start, size_t length);
 
-static void dumpByte (char *carr_buff, unsigned int ui_col,
-		      unsigned int ui_base, unsigned int ui_len,
-		      size_t start, size_t length);
-static void dumpChar (char *carr_buff, unsigned int ui_col,
-		      size_t start, size_t length);
-static void dumpDual (char *carr_buff, unsigned int ui_col,
-		      size_t start, size_t length);
-
-static int findStdC (int ch, const char *stdc);
-
-
+static int findStdC(int ch, const char* stdc);
 
 static const char carr_hexpref[] = "0x";
 static const char carr_DSEPERATE[] = " | ";
 
+static const char* cpa_opt[] = { "-b", "-o", "-d", "-h", "-a", "-c:", "-s:", "-l:", "-t", NULL };
+enum _opt {
+    e_optbin,
+    e_optoct,
+    e_optdec,
+    e_opthex,
+    e_optascii,
+    e_optcol,
+    e_optstart,
+    e_optlength,
+    e_opttwoside
+};
+static const char* cpa_optdes[] = { "-b Binary show", "-o Octal Show", "-d 10 base Show (Decimal)",
+    "-h Hex Show",
+    "-a ASCII Show",
+    "-c:{n} n=number of column", "-s:{n} n=offset",
+    "-l:{n} n=Length", "-t Dual view", NULL };
 
+static const char* cpa_err[] = { "Parameter isn't an unsigned interger", "File can't be accessed",
+    "Column must more than 0", NULL };
 
-static const char *cpa_opt[] =
-  { "-b", "-o", "-d", "-h", "-a", "-c:", "-s:", "-l:", "-t", NULL };
-enum _opt
+enum _err {
+    e_errpar,
+    e_errfile,
+    e_errzero
+};
+
+static const char carr_stdc[] = { '\0', '\a', '\b', '\f', '\n', '\r', '\t', '\v', '\0', '\0' };
+static const char carr_stdc_str[] = { '0', 'a', 'b', 'f', 'n', 'r', 't', 'v', '\0' };
+
+int main(int argc, const char* argv[])
 {
-  e_optbin, e_optoct, e_optdec, e_opthex, e_optascii, e_optcol, e_optstart,
-  e_optlength, e_opttwoside
-};
-static const char *cpa_optdes[] =
-  { "-b Binary show", "-o Octal Show", "-d 10 base Show (Decimal)",
-  "-h Hex Show",
-  "-a ASCII Show",
-  "-c:{n} n=number of column", "-s:{n} n=offset",
-  "-l:{n} n=Length", "-t Dual view", NULL
-};
+    static char carr_buff[BSIZE];
+    unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
+    size_t ui_start, ui_length;
+    unsigned int i;
+    int i_actIndex;
 
-
-static const char *cpa_err[] =
-  { "Parameter isn't an unsigned interger", "File can't be accessed",
-  "Column must more than 0", NULL
-};
-
-enum _err
-{
-  e_errpar, e_errfile, e_errzero
-};
-
-static const char carr_stdc[] =
-  { '\0', '\a', '\b', '\f', '\n', '\r', '\t', '\v', '\0', '\0' };
-static const char carr_stdc_str[] =
-  { '0', 'a', 'b', 'f', 'n', 'r', 't', 'v', '\0' };
-
-int
-main (int argc, const char *argv[])
-{
-  static char carr_buff[BSIZE];
-  unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
-  size_t ui_start, ui_length;
-  unsigned int i;
-  int i_actIndex;
-
-  if (argc == 1)
-    {
-      return showHelp (argv[0], cpa_opt, cpa_optdes, 1);
+    if (argc == 1) {
+        return showHelp(argv[0], cpa_opt, cpa_optdes, 1);
     }
-/******************* Set Default *********************/
+    /******************* Set Default *********************/
 
-  ui_base = BASE;
-  ui_col = DCOLTWOSIDE;
-  ui_len = LEN;
-  ui_colflag = 0;
-  ui_start = 0;
-  ui_length = -1;
-  i_actIndex = e_opttwoside;
+    ui_base = BASE;
+    ui_col = DCOLTWOSIDE;
+    ui_len = LEN;
+    ui_colflag = 0;
+    ui_start = 0;
+    ui_length = -1;
+    i_actIndex = e_opttwoside;
 
-/******************* Parameter Operation *********************/
+    /******************* Parameter Operation *********************/
 
+    for (ui_cindex = DSTART;
+         (ui_pindex = opt_action(argc, argv, cpa_opt, carr_buff, BSIZE,
+              DSTART))
+         != e_optend;
+         ui_cindex++) {
 
-  for (ui_cindex = DSTART;
-       (ui_pindex =
-	opt_action (argc, argv, cpa_opt, carr_buff, BSIZE,
-		    DSTART)) != e_optend; ui_cindex++)
-    {
+        switch (ui_pindex) {
 
-      switch (ui_pindex)
-	{
+        case e_optbin:
+            ui_base = 2;
+            ui_len = 8;
 
-	case e_optbin:
-	  ui_base = 2;
-	  ui_len = 8;
+            if (!ui_colflag)
+                ui_col = 8;
 
-	  if (!ui_colflag)
-	    ui_col = 8;
+            i_actIndex = -1;
+            break;
 
-	  i_actIndex = -1;
-	  break;
+        case e_optoct:
+            ui_base = 8;
+            ui_len = 3;
 
-	case e_optoct:
-	  ui_base = 8;
-	  ui_len = 3;
+            if (!ui_colflag)
+                ui_col = 8;
 
-	  if (!ui_colflag)
-	    ui_col = 8;
+            i_actIndex = -1;
+            break;
 
-	  i_actIndex = -1;
-	  break;
+        case e_optdec:
+            ui_base = 10;
+            ui_len = 3;
 
-	case e_optdec:
-	  ui_base = 10;
-	  ui_len = 3;
+            if (!ui_colflag)
+                ui_col = 10;
 
-	  if (!ui_colflag)
-	    ui_col = 10;
+            i_actIndex = -1;
+            break;
 
-	  i_actIndex = -1;
-	  break;
+        case e_opthex:
+            ui_base = 16;
+            ui_len = 2;
 
-	case e_opthex:
-	  ui_base = 16;
-	  ui_len = 2;
+            if (!ui_colflag)
+                ui_col = 16;
 
-	  if (!ui_colflag)
-	    ui_col = 16;
+            i_actIndex = -1;
+            break;
 
-	  i_actIndex = -1;
-	  break;
+        case e_optascii:
+            i_actIndex = e_optascii;
+            break;
 
-	case e_optascii:
-	  i_actIndex = e_optascii;
-	  break;
+        case e_optcol:
+            if (!isUint(carr_buff)
+                && (!isUintHex(&carr_buff[strlen(carr_hexpref)])
+                       || strncmp(carr_buff, carr_hexpref,
+                              strlen(carr_hexpref)))) {
+                fprintf(stderr, "PARAM: %s\n", carr_buff);
+                return showErr(cpa_err, e_errpar);
+            }
+            i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-	case e_optcol:
-	  if (!isUint (carr_buff)
-	      && (!isUintHex (&carr_buff[strlen (carr_hexpref)])
-		  || strncmp (carr_buff, carr_hexpref,
-			      strlen (carr_hexpref))))
-	    {
-	      fprintf (stderr, "PARAM: %s\n", carr_buff);
-	      return showErr (cpa_err, e_errpar);
-	    }
-	  i =
-	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
-	    10;
+            if (!(ui_col = s2ui(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i)))
 
+            {
+                fprintf(stderr, "PARAM: %s\n", carr_buff);
+                return showErr(cpa_err, e_errzero);
+            }
+            ui_colflag = 1;
 
-	  if (!
-	      (ui_col =
-	       s2ui (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i)))
+            break;
 
-	    {
-	      fprintf (stderr, "PARAM: %s\n", carr_buff);
-	      return showErr (cpa_err, e_errzero);
-	    }
-	  ui_colflag = 1;
+        case e_optstart:
+            if (!isUint(carr_buff)
+                && (!isUintHex(&carr_buff[strlen(carr_hexpref)])
+                       || strncmp(carr_buff, carr_hexpref,
+                              strlen(carr_hexpref)))) {
+                fprintf(stderr, "PARAM: %s\n", carr_buff);
+                return showErr(cpa_err, e_errpar);
+            }
+            i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-	  break;
+            ui_start = s2uL(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
-	case e_optstart:
-	  if (!isUint (carr_buff)
-	      && (!isUintHex (&carr_buff[strlen (carr_hexpref)])
-		  || strncmp (carr_buff, carr_hexpref,
-			      strlen (carr_hexpref))))
-	    {
-	      fprintf (stderr, "PARAM: %s\n", carr_buff);
-	      return showErr (cpa_err, e_errpar);
-	    }
-	  i =
-	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
-	    10;
+            break;
 
-	  ui_start =
-	    s2uL (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
+        case e_optlength:
+            if (!isUint(carr_buff)
+                && (!isUintHex(&carr_buff[strlen(carr_hexpref)])
+                       || strncmp(carr_buff, carr_hexpref,
+                              strlen(carr_hexpref)))) {
+                fprintf(stderr, "PARAM: %s\n", carr_buff);
+                return showErr(cpa_err, e_errpar);
+            }
+            i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-	  break;
+            ui_length = s2uL(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
-	case e_optlength:
-	  if (!isUint (carr_buff)
-	      && (!isUintHex (&carr_buff[strlen (carr_hexpref)])
-		  || strncmp (carr_buff, carr_hexpref,
-			      strlen (carr_hexpref))))
-	    {
-	      fprintf (stderr, "PARAM: %s\n", carr_buff);
-	      return showErr (cpa_err, e_errpar);
-	    }
-	  i =
-	    (!strncmp (carr_buff, carr_hexpref, strlen (carr_hexpref))) ? 16 :
-	    10;
+            break;
 
-	  ui_length =
-	    s2uL (&carr_buff[(i == 16) ? strlen (carr_hexpref) : 0], i);
+        case e_opttwoside:
 
-	  break;
+            i_actIndex = e_opttwoside;
 
-	case e_opttwoside:
+            if (!ui_colflag)
+                ui_col = DCOLTWOSIDE;
 
-	  i_actIndex = e_opttwoside;
+            break;
 
-	  if (!ui_colflag)
-	    ui_col = DCOLTWOSIDE;
+        case e_optother:
 
+            switch (i_actIndex) {
 
-	  break;
+            case e_optascii:
+                dumpChar(carr_buff, ui_col, ui_start, ui_length);
+                break;
 
-	case e_optother:
+            case e_opttwoside:
+                dumpDual(carr_buff, ui_col, ui_start, ui_length);
+                break;
 
-	  switch (i_actIndex)
-	    {
+            default:
+                dumpByte(carr_buff, ui_col, ui_base, ui_len, ui_start,
+                    ui_length);
+            }
 
-	    case e_optascii:
-	      dumpChar (carr_buff, ui_col, ui_start, ui_length);
-	      break;
-
-	    case e_opttwoside:
-	      dumpDual (carr_buff, ui_col, ui_start, ui_length);
-	      break;
-
-	    default:
-	      dumpByte (carr_buff, ui_col, ui_base, ui_len, ui_start,
-			ui_length);
-	    }
-
-	  break;
-
-
-	}
-
+            break;
+        }
     }
 
-
-  return 0;
+    return 0;
 }
 
 static int
-showHelp (const char *path, const char *opt[], const char *optdes[], int ret)
+showHelp(const char* path, const char* opt[], const char* optdes[], int ret)
 {
-  unsigned int i;
-  fprintf (stderr, "\nUSAGE: %s {option} file\n\n", path + basename (path));
+    unsigned int i;
+    fprintf(stderr, "\nUSAGE: %s {option} file\n\n", path + basename(path));
 
-  fprintf (stderr, "OPTIONS\n");
-  for (i = 0; opt[i] && optdes[i]; i++)
-    {
-      fprintf (stderr, "%s =\t%s\n", opt[i], optdes[i]);
+    fprintf(stderr, "OPTIONS\n");
+    for (i = 0; opt[i] && optdes[i]; i++) {
+        fprintf(stderr, "%s =\t%s\n", opt[i], optdes[i]);
     }
-  fputc ('\n', stderr);
+    fputc('\n', stderr);
 
-  return ret;
+    return ret;
 }
 
 static unsigned int
-basename (const char *ch)
+basename(const char* ch)
 {
-  unsigned int i, j;
-  for (i = 0, j = 0; ch[i]; i++)
-    {
-      if (ch[i] == '\\' || ch[i] == '/')
-	{
-	  j = i;
-	}
+    unsigned int i, j;
+    for (i = 0, j = 0; ch[i]; i++) {
+        if (ch[i] == '\\' || ch[i] == '/') {
+            j = i;
+        }
     }
-  return (j == 0) ? 0 : j + 1;
+    return (j == 0) ? 0 : j + 1;
 }
 
 static int
-showErr (const char *err[], unsigned int index)
+showErr(const char* err[], unsigned int index)
 {
 
-  fprintf (stderr, "ERROR NO %u: %s\n", index, err[index]);
-  return -1 * (++index);
+    fprintf(stderr, "ERROR NO %u: %s\n", index, err[index]);
+    return -1 * (++index);
 }
 
 static void
-dumpByte (char *carr_buff, unsigned int ui_col, unsigned int ui_base,
-	  unsigned int ui_len, size_t start, size_t length)
+dumpByte(char* carr_buff, unsigned int ui_col, unsigned int ui_base,
+    unsigned int ui_len, size_t start, size_t length)
 {
-  unsigned int i;
-  size_t j;
-  int i_ch;
-  FILE *sptr_fin;
-  if (!(sptr_fin = fopen (carr_buff, "rb")))
-    {
-      fprintf (stderr, "FILE: %s\n", carr_buff);
-      showErr (cpa_err, e_errfile);
-      return;
+    unsigned int i;
+    size_t j;
+    int i_ch;
+    FILE* sptr_fin;
+    if (!(sptr_fin = fopen(carr_buff, "rb"))) {
+        fprintf(stderr, "FILE: %s\n", carr_buff);
+        showErr(cpa_err, e_errfile);
+        return;
     }
 
+    for (i = 0; i < DLENGTH; i++)
+        putchar(FCHAR);
 
-  for (i = 0; i < DLENGTH; i++)
-    putchar (FCHAR);
+    printf(" %s ", carr_buff + basename(carr_buff));
 
-  printf (" %s ", carr_buff + basename (carr_buff));
+    for (i = 0; i < DLENGTH; i++)
+        putchar('=');
+    putchar('\n');
 
-  for (i = 0; i < DLENGTH; i++)
-    putchar ('=');
-  putchar ('\n');
+    if (fseek(sptr_fin, start, SEEK_SET) < 0)
+        return;
 
-  if (fseek (sptr_fin, start, SEEK_SET) < 0)
-    return;
+    for (i = 0, j = 0; (i_ch = fgetc(sptr_fin)) != EOF; j++) {
 
-  for (i = 0, j = 0; (i_ch = fgetc (sptr_fin)) != EOF; j++)
-    {
+        if (j >= (length) && (length != -1)) {
+            putchar('\n');
+            return;
+        }
 
+        if (!(j % ui_col)) {
 
-      if (j >= (length) && (length != -1))
-	{
-	  putchar ('\n');
-	  return;
-	}
+            sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
-      if (!(j % ui_col))
-	{
+            printf("%s: ", carr_buff);
+        }
 
-	  uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+        ui2s(i_ch, carr_buff, BSIZE, ui_base, ui_len);
+        printf("%s%c", carr_buff, DELIM);
 
-	  printf ("%s: ", carr_buff);
-	}
-
-      ui2s (i_ch, carr_buff, BSIZE, ui_base, ui_len);
-      printf ("%s%c", carr_buff, DELIM);
-
-      if ((ui_col) && (++i > ui_col - 1))
-	{
-	  putchar ('\n');
-	  i = 0;
-	}
+        if ((ui_col) && (++i > ui_col - 1)) {
+            putchar('\n');
+            i = 0;
+        }
     }
-  putchar ('\n');
-  fclose (sptr_fin);
-
+    putchar('\n');
+    fclose(sptr_fin);
 }
 
 static void
-dumpChar (char *carr_buff, unsigned int ui_col, size_t start,
-	  size_t length)
+dumpChar(char* carr_buff, unsigned int ui_col, size_t start,
+    size_t length)
 {
-  unsigned int i;
-  size_t j;
-  int i_ch;
-  int k;
-  FILE *sptr_fin;
-  if (!(sptr_fin = fopen (carr_buff, "rb")))
-    {
-      fprintf (stderr, "FILE: %s\n", carr_buff);
-      showErr (cpa_err, e_errfile);
-      return;
+    unsigned int i;
+    size_t j;
+    int i_ch;
+    int k;
+    FILE* sptr_fin;
+    if (!(sptr_fin = fopen(carr_buff, "rb"))) {
+        fprintf(stderr, "FILE: %s\n", carr_buff);
+        showErr(cpa_err, e_errfile);
+        return;
     }
 
+    for (i = 0; i < DLENGTH; i++)
+        putchar(FCHAR);
 
-  for (i = 0; i < DLENGTH; i++)
-    putchar (FCHAR);
+    printf(" %s ", carr_buff + basename(carr_buff));
 
-  printf (" %s ", carr_buff + basename (carr_buff));
+    for (i = 0; i < DLENGTH; i++)
+        putchar('=');
+    putchar('\n');
 
-  for (i = 0; i < DLENGTH; i++)
-    putchar ('=');
-  putchar ('\n');
+    if (fseek(sptr_fin, start, SEEK_SET) < 0)
+        return;
 
-  if (fseek (sptr_fin, start, SEEK_SET) < 0)
-    return;
+    for (i = 0, j = 0; (i_ch = fgetc(sptr_fin)) != EOF; j++) {
 
-  for (i = 0, j = 0; (i_ch = fgetc (sptr_fin)) != EOF; j++)
-    {
+        if ((j >= length) && (length != -1)) {
+            putchar('\n');
+            return;
+        }
+        if (!(j % ui_col)) {
 
-      if ((j >= length) && (length != -1))
-	{
-	  putchar ('\n');
-	  return;
-	}
-      if (!(j % ui_col))
-	{
+            sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
-	  uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+            printf("%s: ", carr_buff);
+        }
+        if ((k = findStdC(i_ch, carr_stdc)) > -1)
+            printf("\\%c%c", carr_stdc_str[k], DELIM);
 
-	  printf ("%s: ", carr_buff);
-	}
-      if ((k = findStdC (i_ch, carr_stdc)) > -1)
-	printf ("\\%c%c", carr_stdc_str[k], DELIM);
+        else
+            printf(" %c%c", i_ch, DELIM);
 
-      else
-	printf (" %c%c", i_ch, DELIM);
-
-      if ((ui_col) && (++i > ui_col - 1))
-	{
-	  putchar ('\n');
-	  i = 0;
-	}
+        if ((ui_col) && (++i > ui_col - 1)) {
+            putchar('\n');
+            i = 0;
+        }
     }
-  putchar ('\n');
-  fclose (sptr_fin);
-
+    putchar('\n');
+    fclose(sptr_fin);
 }
-
 
 static void
-dumpDual (char *carr_buff, unsigned int ui_col, size_t start,
-	  size_t length)
+dumpDual(char* carr_buff, unsigned int ui_col, size_t start,
+    size_t length)
 {
-  unsigned int i, n, p, l, m;
-  size_t j;
-  int i_ch;
-  int k;
-  long tmp1, tmp2;
-  FILE *sptr_fin;
+    unsigned int i, n, p, l, m;
+    size_t j;
+    int i_ch;
+    int k;
+    long tmp1, tmp2;
+    FILE* sptr_fin;
 
-  if (!(sptr_fin = fopen (carr_buff, "rb")))
-    {
-      fprintf (stderr, "FILE: %s\n", carr_buff);
-      showErr (cpa_err, e_errfile);
-      return;
+    if (!(sptr_fin = fopen(carr_buff, "rb"))) {
+        fprintf(stderr, "FILE: %s\n", carr_buff);
+        showErr(cpa_err, e_errfile);
+        return;
     }
 
-  for (i = 0; i < DLENGTH; i++)
-    putchar (FCHAR);
+    for (i = 0; i < DLENGTH; i++)
+        putchar(FCHAR);
 
-  printf (" %s ", carr_buff + basename (carr_buff));
+    printf(" %s ", carr_buff + basename(carr_buff));
 
-  for (i = 0; i < DLENGTH; i++)
-    putchar ('=');
-  putchar ('\n');
+    for (i = 0; i < DLENGTH; i++)
+        putchar('=');
+    putchar('\n');
 
+    if (fseek(sptr_fin, start, SEEK_SET) < 0)
+        return;
 
-  if (fseek (sptr_fin, start, SEEK_SET) < 0)
-    return;
+    for (tmp1 = tmp2 = ftell(sptr_fin), j = 0, m = 0, n = 0;; n++) {
+        tmp1 = ftell(sptr_fin);
+        fseek(sptr_fin, tmp2, SEEK_SET);
 
-  for (tmp1 = tmp2 = ftell (sptr_fin), j = 0, m = 0, n = 0;; n++)
-    {
-      tmp1 = ftell (sptr_fin);
-      fseek (sptr_fin, tmp2, SEEK_SET);
+        for (m = j, p = 0, i_ch = 0, l = j; (j < l + ui_col); j++, p++) {
 
+            if ((i_ch = fgetc(sptr_fin)) == EOF
+                || (j >= length && (length != -1))) {
+                break;
+            }
 
+            if (!(j % ui_col)) {
 
-      for (m = j, p = 0, i_ch = 0, l = j; (j < l + ui_col); j++, p++)
-	{
+                sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
-	  if ((i_ch = fgetc (sptr_fin)) == EOF
-	      || (j >= length && (length != -1)))
-	    {
-	      break;
-	    }
+                printf("%s: ", carr_buff);
+            }
 
-	  if (!(j % ui_col))
-	    {
+            ui2s(i_ch, carr_buff, BSIZE, BASE, LEN);
+            printf("%s%c", carr_buff, DELIM);
+        }
 
-	      uL2s (j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+        if (!n && p < ui_col && p > 0)
+            printf(carr_DSEPERATE);
 
-	      printf ("%s: ", carr_buff);
-	    }
+        else {
 
-	  ui2s (i_ch, carr_buff, BSIZE, BASE, LEN);
-	  printf ("%s%c", carr_buff, DELIM);
+            if ((j % ui_col) && (ui_col < length)
+                && (((j <= length) && (length != -1)) || (length == -1)))
+                for (i = 0; i < (ui_col - j % ui_col); i++)
+                    for (k = 0; k < LEN + 1; k++)
+                        printf("%c", DELIM);
 
-	}
+            if (p)
+                printf(carr_DSEPERATE);
+            else
+                return;
+        }
 
+        tmp2 = ftell(sptr_fin);
+        fseek(sptr_fin, tmp1, SEEK_SET);
 
-      if (!n && p < ui_col && p > 0)
-	printf (carr_DSEPERATE);
+        for (j = m, i = 0, l = j; j < l + ui_col; j++) {
 
-      else
-	{
+            if ((i_ch = fgetc(sptr_fin)) == EOF
+                || (j >= length && (length != -1))) {
+                putchar('\n');
+                return;
+            }
 
-	  if ((j % ui_col) && (ui_col < length)
-	      && (((j <= length) && (length != -1)) || (length == -1)))
-	    for (i = 0; i < (ui_col - j % ui_col); i++)
-	      for (k = 0; k < LEN + 1; k++)
-		printf ("%c", DELIM);
+            if ((k = findStdC(i_ch, carr_stdc)) > -1)
+                printf("\\%c%c", carr_stdc_str[k], DELIM);
 
-	  if (p)
-	    printf (carr_DSEPERATE);
-	  else
-	    return;
+            else
+                printf(" %c%c", i_ch, DELIM);
 
-
-	}
-
-
-
-      tmp2 = ftell (sptr_fin);
-      fseek (sptr_fin, tmp1, SEEK_SET);
-
-
-      for (j = m, i = 0, l = j; j < l + ui_col; j++)
-	{
-
-	  if ((i_ch = fgetc (sptr_fin)) == EOF
-	      || (j >= length && (length != -1)))
-	    {
-	      putchar ('\n');
-	      return;
-	    }
-
-	  if ((k = findStdC (i_ch, carr_stdc)) > -1)
-	    printf ("\\%c%c", carr_stdc_str[k], DELIM);
-
-	  else
-	    printf (" %c%c", i_ch, DELIM);
-
-	  if (ui_col && (++i > ui_col - 1))
-	    {
-	      putchar ('\n');
-	      i = 0;
-	    }
-	}
-
-
+            if (ui_col && (++i > ui_col - 1)) {
+                putchar('\n');
+                i = 0;
+            }
+        }
     }
 
-  fclose (sptr_fin);
-
+    fclose(sptr_fin);
 }
-
 
 static int
-findStdC (int ch, const char *stdc)
+findStdC(int ch, const char* stdc)
 {
-  int i;
-  for (i = 0; (stdc[i] != 0) || ((stdc[i + 1] != 0)); i++)
-    {
-      if (ch == stdc[i])
-	return i;
+    int i;
+    for (i = 0; (stdc[i] != 0) || ((stdc[i + 1] != 0)); i++) {
+        if (ch == stdc[i])
+            return i;
     }
 
-  return -1;
+    return -1;
 }
