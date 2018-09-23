@@ -25,16 +25,16 @@ static int
 showErr(const char* err[], unsigned int index);
 
 static void
-dumpByte(char* carr_buff,
+dumpByte(FILE *sptr_fin,char* carr_buff,
     unsigned int ui_col,
     unsigned int ui_base,
     unsigned int ui_len,
     size_t start,
     size_t length);
 static void
-dumpChar(char* carr_buff, unsigned int ui_col, size_t start, size_t length);
+dumpChar(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, size_t start, size_t length);
 static void
-dumpDual(char* carr_buff, unsigned int ui_col, size_t start, size_t length);
+dumpDual(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, size_t start, size_t length);
 
 static int
 findStdC(int ch, const char* stdc);
@@ -84,6 +84,7 @@ static const char carr_stdc_str[] = { '0', 'a', 'b', 'f', 'n',
 
 int main(int argc, const char* argv[])
 {
+	FILE* sptr_fin;
     static char carr_buff[BSIZE];
     unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
     size_t ui_start, ui_length;
@@ -206,20 +207,27 @@ int main(int argc, const char* argv[])
             break;
 
         case e_optother:
+		
+			if (!(sptr_fin = fopen(carr_buff, "rb"))) {
+				fprintf(stderr, "FILE: %s\n", carr_buff);
+				return showErr(cpa_err, e_errfile);
+			}
 
             switch (i_actIndex) {
 
             case e_optascii:
-                dumpChar(carr_buff, ui_col, ui_start, ui_length);
+                dumpChar(sptr_fin,carr_buff, ui_col, ui_start, ui_length);
                 break;
 
             case e_opttwoside:
-                dumpDual(carr_buff, ui_col, ui_start, ui_length);
+                dumpDual(sptr_fin,carr_buff, ui_col, ui_start, ui_length);
                 break;
 
             default:
-                dumpByte(carr_buff, ui_col, ui_base, ui_len, ui_start, ui_length);
+                dumpByte(sptr_fin,carr_buff, ui_col, ui_base, ui_len, ui_start, ui_length);
             }
+			
+			fclose(sptr_fin);
 
             break;
         }
@@ -247,11 +255,8 @@ static unsigned int
 basename(const char* ch)
 {
     unsigned int i, j;
-    for (i = 0, j = 0; ch[i]; i++) {
-        if (ch[i] == '\\' || ch[i] == '/') {
-            j = i+1;
-        }
-    }
+    for (i = 0, j = 0; ch[i]; i++) if (ch[i] == '\\' || ch[i] == '/') j = i+1;
+
     return j;
 }
 
@@ -264,7 +269,7 @@ showErr(const char* err[], unsigned int index)
 }
 
 static void
-dumpByte(char* carr_buff,
+dumpByte(FILE *sptr_fin, char* carr_buff,
     unsigned int ui_col,
     unsigned int ui_base,
     unsigned int ui_len,
@@ -274,12 +279,6 @@ dumpByte(char* carr_buff,
     unsigned int i;
     size_t j;
     int i_ch;
-    FILE* sptr_fin;
-    if (!(sptr_fin = fopen(carr_buff, "rb"))) {
-        fprintf(stderr, "FILE: %s\n", carr_buff);
-        showErr(cpa_err, e_errfile);
-        return;
-    }
 
     for (i = 0; i < DLENGTH; i++)
         putchar(FCHAR);
@@ -316,22 +315,15 @@ dumpByte(char* carr_buff,
         }
     }
     putchar('\n');
-    fclose(sptr_fin);
 }
 
 static void
-dumpChar(char* carr_buff, unsigned int ui_col, size_t start, size_t length)
+dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, size_t start, size_t length)
 {
     unsigned int i;
     size_t j;
     int i_ch;
     int k;
-    FILE* sptr_fin;
-    if (!(sptr_fin = fopen(carr_buff, "rb"))) {
-        fprintf(stderr, "FILE: %s\n", carr_buff);
-        showErr(cpa_err, e_errfile);
-        return;
-    }
 
     for (i = 0; i < DLENGTH; i++)
         putchar(FCHAR);
@@ -369,24 +361,16 @@ dumpChar(char* carr_buff, unsigned int ui_col, size_t start, size_t length)
         }
     }
     putchar('\n');
-    fclose(sptr_fin);
 }
 
 static void
-dumpDual(char* carr_buff, unsigned int ui_col, size_t start, size_t length)
+dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, size_t start, size_t length)
 {
     unsigned int i, n, p, l, m;
     size_t j;
     int i_ch;
     int k;
     long tmp1, tmp2;
-    FILE* sptr_fin;
-
-    if (!(sptr_fin = fopen(carr_buff, "rb"))) {
-        fprintf(stderr, "FILE: %s\n", carr_buff);
-        showErr(cpa_err, e_errfile);
-        return;
-    }
 
     for (i = 0; i < DLENGTH; i++)
         putchar(FCHAR);
@@ -460,7 +444,6 @@ dumpDual(char* carr_buff, unsigned int ui_col, size_t start, size_t length)
         }
     }
 
-    fclose(sptr_fin);
 }
 
 static int
