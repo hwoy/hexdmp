@@ -332,12 +332,14 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
             putchar('\n');
             return;
         }
+		
         if (!(j % ui_col)) {
 
             sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
             printf("%s: ", carr_buff);
         }
+		
         if ((k = findStdC(i_ch, carr_stdc)) > -1)
             printf("\\%c%c", carr_stdc_str[k], DELIM);
 
