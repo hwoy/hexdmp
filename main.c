@@ -17,25 +17,33 @@
 
 #define DCOLTWOSIDE 8
 
-static int showHelp(const char* path, const char* opt[],
-    const char* optdes[], int ret);
-static unsigned int basename(const char* ch);
-static int showErr(const char* err[], unsigned int index);
+static int
+showHelp(const char* path, const char* opt[], const char* optdes[], int ret);
+static unsigned int
+basename(const char* ch);
+static int
+showErr(const char* err[], unsigned int index);
 
-static void dumpByte(char* carr_buff, unsigned int ui_col,
-    unsigned int ui_base, unsigned int ui_len,
-    size_t start, size_t length);
-static void dumpChar(char* carr_buff, unsigned int ui_col,
-    size_t start, size_t length);
-static void dumpDual(char* carr_buff, unsigned int ui_col,
-    size_t start, size_t length);
+static void
+dumpByte(char* carr_buff,
+    unsigned int ui_col,
+    unsigned int ui_base,
+    unsigned int ui_len,
+    size_t start,
+    size_t length);
+static void
+dumpChar(char* carr_buff, unsigned int ui_col, size_t start, size_t length);
+static void
+dumpDual(char* carr_buff, unsigned int ui_col, size_t start, size_t length);
 
-static int findStdC(int ch, const char* stdc);
+static int
+findStdC(int ch, const char* stdc);
 
 static const char carr_hexpref[] = "0x";
 static const char carr_DSEPERATE[] = " | ";
 
-static const char* cpa_opt[] = { "-b", "-o", "-d", "-h", "-a", "-c:", "-s:", "-l:", "-t", NULL };
+static const char* cpa_opt[] = { "-b", "-o", "-d", "-h", "-a",
+    "-c:", "-s:", "-l:", "-t", NULL };
 enum _opt {
     e_optbin,
     e_optoct,
@@ -47,14 +55,21 @@ enum _opt {
     e_optlength,
     e_opttwoside
 };
-static const char* cpa_optdes[] = { "-b Binary show", "-o Octal Show", "-d 10 base Show (Decimal)",
+static const char* cpa_optdes[] = { "-b Binary show",
+    "-o Octal Show",
+    "-d 10 base Show (Decimal)",
     "-h Hex Show",
     "-a ASCII Show",
-    "-c:{n} n=number of column", "-s:{n} n=offset",
-    "-l:{n} n=Length", "-t Dual view", NULL };
+    "-c:{n} n=number of column",
+    "-s:{n} n=offset",
+    "-l:{n} n=Length",
+    "-t Dual view",
+    NULL };
 
-static const char* cpa_err[] = { "Parameter isn't an unsigned interger", "File can't be accessed",
-    "Column must more than 0", NULL };
+static const char* cpa_err[] = { "Parameter isn't an unsigned interger",
+    "File can't be accessed",
+    "Column must more than 0",
+    NULL };
 
 enum _err {
     e_errpar,
@@ -62,8 +77,10 @@ enum _err {
     e_errzero
 };
 
-static const char carr_stdc[] = { '\0', '\a', '\b', '\f', '\n', '\r', '\t', '\v', '\0', '\0' };
-static const char carr_stdc_str[] = { '0', 'a', 'b', 'f', 'n', 'r', 't', 'v', '\0' };
+static const char carr_stdc[] = { '\0', '\a', '\b', '\f', '\n',
+    '\r', '\t', '\v', '\0', '\0' };
+static const char carr_stdc_str[] = { '0', 'a', 'b', 'f', 'n',
+    'r', 't', 'v', '\0' };
 
 int main(int argc, const char* argv[])
 {
@@ -89,8 +106,8 @@ int main(int argc, const char* argv[])
     /******************* Parameter Operation *********************/
 
     for (ui_cindex = DSTART;
-         (ui_pindex = opt_action(argc, argv, cpa_opt, carr_buff, BSIZE,
-              DSTART))
+         (ui_pindex = opt_action(
+              argc, argv, cpa_opt, carr_buff, BSIZE, DSTART))
          != e_optend;
          ui_cindex++) {
 
@@ -141,10 +158,7 @@ int main(int argc, const char* argv[])
             break;
 
         case e_optcol:
-            if (!isUint(carr_buff)
-                && (!isUintHex(&carr_buff[strlen(carr_hexpref)])
-                       || strncmp(carr_buff, carr_hexpref,
-                              strlen(carr_hexpref)))) {
+            if (!isUint(carr_buff) && (!isUintHex(&carr_buff[strlen(carr_hexpref)]) || strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref)))) {
                 fprintf(stderr, "PARAM: %s\n", carr_buff);
                 return showErr(cpa_err, e_errpar);
             }
@@ -161,30 +175,24 @@ int main(int argc, const char* argv[])
             break;
 
         case e_optstart:
-            if (!isUint(carr_buff)
-                && (!isUintHex(&carr_buff[strlen(carr_hexpref)])
-                       || strncmp(carr_buff, carr_hexpref,
-                              strlen(carr_hexpref)))) {
+            if (!isUint(carr_buff) && (!isUintHex(&carr_buff[strlen(carr_hexpref)]) || strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref)))) {
                 fprintf(stderr, "PARAM: %s\n", carr_buff);
                 return showErr(cpa_err, e_errpar);
             }
             i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-            ui_start = s2uL(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
+            ui_start = sT2s(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
             break;
 
         case e_optlength:
-            if (!isUint(carr_buff)
-                && (!isUintHex(&carr_buff[strlen(carr_hexpref)])
-                       || strncmp(carr_buff, carr_hexpref,
-                              strlen(carr_hexpref)))) {
+            if (!isUint(carr_buff) && (!isUintHex(&carr_buff[strlen(carr_hexpref)]) || strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref)))) {
                 fprintf(stderr, "PARAM: %s\n", carr_buff);
                 return showErr(cpa_err, e_errpar);
             }
             i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-            ui_length = s2uL(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
+            ui_length = sT2s(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
             break;
 
@@ -210,8 +218,7 @@ int main(int argc, const char* argv[])
                 break;
 
             default:
-                dumpByte(carr_buff, ui_col, ui_base, ui_len, ui_start,
-                    ui_length);
+                dumpByte(carr_buff, ui_col, ui_base, ui_len, ui_start, ui_length);
             }
 
             break;
@@ -257,8 +264,12 @@ showErr(const char* err[], unsigned int index)
 }
 
 static void
-dumpByte(char* carr_buff, unsigned int ui_col, unsigned int ui_base,
-    unsigned int ui_len, size_t start, size_t length)
+dumpByte(char* carr_buff,
+    unsigned int ui_col,
+    unsigned int ui_base,
+    unsigned int ui_len,
+    size_t start,
+    size_t length)
 {
     unsigned int i;
     size_t j;
@@ -309,8 +320,7 @@ dumpByte(char* carr_buff, unsigned int ui_col, unsigned int ui_base,
 }
 
 static void
-dumpChar(char* carr_buff, unsigned int ui_col, size_t start,
-    size_t length)
+dumpChar(char* carr_buff, unsigned int ui_col, size_t start, size_t length)
 {
     unsigned int i;
     size_t j;
@@ -363,8 +373,7 @@ dumpChar(char* carr_buff, unsigned int ui_col, size_t start,
 }
 
 static void
-dumpDual(char* carr_buff, unsigned int ui_col, size_t start,
-    size_t length)
+dumpDual(char* carr_buff, unsigned int ui_col, size_t start, size_t length)
 {
     unsigned int i, n, p, l, m;
     size_t j;
@@ -397,8 +406,7 @@ dumpDual(char* carr_buff, unsigned int ui_col, size_t start,
 
         for (m = j, p = 0, i_ch = 0, l = j; (j < l + ui_col); j++, p++) {
 
-            if ((i_ch = fgetc(sptr_fin)) == EOF
-                || (j >= length && (length != -1))) {
+            if ((i_ch = fgetc(sptr_fin)) == EOF || (j >= length && (length != -1))) {
                 break;
             }
 
@@ -418,8 +426,7 @@ dumpDual(char* carr_buff, unsigned int ui_col, size_t start,
 
         else {
 
-            if ((j % ui_col) && (ui_col < length)
-                && (((j <= length) && (length != -1)) || (length == -1)))
+            if ((j % ui_col) && (ui_col < length) && (((j <= length) && (length != -1)) || (length == -1)))
                 for (i = 0; i < (ui_col - j % ui_col); i++)
                     for (k = 0; k < LEN + 1; k++)
                         printf("%c", DELIM);
@@ -435,8 +442,7 @@ dumpDual(char* carr_buff, unsigned int ui_col, size_t start,
 
         for (j = m, i = 0, l = j; j < l + ui_col; j++) {
 
-            if ((i_ch = fgetc(sptr_fin)) == EOF
-                || (j >= length && (length != -1))) {
+            if ((i_ch = fgetc(sptr_fin)) == EOF || (j >= length && (length != -1))) {
                 putchar('\n');
                 return;
             }
