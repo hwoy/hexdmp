@@ -17,6 +17,7 @@
 
 #define DCOLTWOSIDE 8
 
+static void printoutheader(char *carr_buff,int fchar,unsigned int length);
 static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret);
 static unsigned int
@@ -30,11 +31,11 @@ dumpByte(FILE *sptr_fin,char* carr_buff,
     unsigned int ui_base,
     unsigned int ui_len,
     fpos_t start,
-    unsigned int length);
+    size_t length);
 static void
-dumpChar(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, fpos_t start, unsigned int length);
+dumpChar(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, fpos_t start, size_t length);
 static void
-dumpDual(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, fpos_t start, unsigned int length);
+dumpDual(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, fpos_t start, size_t length);
 
 static int
 findStdC(int ch, const char* stdc);
@@ -87,7 +88,8 @@ int main(int argc, const char* argv[])
 	FILE* sptr_fin;
     static char carr_buff[BSIZE];
     unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
-    fpos_t ui_start, ui_length;
+    fpos_t ui_start;
+	size_t ui_length;
     unsigned int i;
     int i_actIndex;
 
@@ -193,7 +195,7 @@ int main(int argc, const char* argv[])
             }
             i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-            ui_length = s2ui(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
+            ui_length = s2sT(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
             break;
 
@@ -274,20 +276,14 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
     unsigned int ui_base,
     unsigned int ui_len,
     fpos_t start,
-    unsigned int length)
+    size_t length)
 {
     unsigned int i;
     size_t j;
     int i_ch;
+	
+	printoutheader(carr_buff,FCHAR,DLENGTH);
 
-    for (i = 0; i < DLENGTH; i++)
-        putchar(FCHAR);
-
-    printf(" %s ", carr_buff + basename(carr_buff));
-
-    for (i = 0; i < DLENGTH; i++)
-        putchar('=');
-    putchar('\n');
 
     if (fsetpos(sptr_fin,&start))
         return;
@@ -318,21 +314,14 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
 }
 
 static void
-dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, unsigned int length)
+dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
     unsigned int i;
     size_t j;
     int i_ch;
     int k;
 
-    for (i = 0; i < DLENGTH; i++)
-        putchar(FCHAR);
-
-    printf(" %s ", carr_buff + basename(carr_buff));
-
-    for (i = 0; i < DLENGTH; i++)
-        putchar('=');
-    putchar('\n');
+	printoutheader(carr_buff,FCHAR,DLENGTH);
 
     if (fsetpos(sptr_fin,&start))
         return;
@@ -364,7 +353,7 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, uns
 }
 
 static void
-dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, unsigned int length)
+dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
     unsigned int i, n, p, l, m;
     size_t j;
@@ -372,14 +361,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, uns
     int k;
     fpos_t tmp1, tmp2;
 
-    for (i = 0; i < DLENGTH; i++)
-        putchar(FCHAR);
-
-    printf(" %s ", carr_buff + basename(carr_buff));
-
-    for (i = 0; i < DLENGTH; i++)
-        putchar('=');
-    putchar('\n');
+	printoutheader(carr_buff,FCHAR,DLENGTH);
 
     if (fsetpos(sptr_fin,&start))
         return;
@@ -456,4 +438,17 @@ findStdC(int ch, const char* stdc)
     }
 
     return -1;
+}
+
+static void printoutheader(char *carr_buff,int fchar,unsigned int length)
+{
+	unsigned int i;
+    for (i = 0; i < length; i++)
+        putchar(fchar);
+
+    printf(" %s ", carr_buff + basename(carr_buff));
+
+    for (i = 0; i < length; i++)
+        putchar('=');
+    putchar('\n');
 }
