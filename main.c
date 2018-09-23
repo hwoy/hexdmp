@@ -370,7 +370,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, size_t start, siz
     size_t j;
     int i_ch;
     int k;
-    long tmp1, tmp2;
+    fpos_t tmp1, tmp2;
 
     for (i = 0; i < DLENGTH; i++)
         putchar(FCHAR);
@@ -384,9 +384,9 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, size_t start, siz
     if (fseek(sptr_fin, start, SEEK_SET) < 0)
         return;
 
-    for (tmp1 = tmp2 = ftell(sptr_fin), j = 0, m = 0, n = 0;; n++) {
-        tmp1 = ftell(sptr_fin);
-        fseek(sptr_fin, tmp2, SEEK_SET);
+    for (fgetpos(sptr_fin,&tmp1),fgetpos(sptr_fin,&tmp2), j = 0, m = 0, n = 0;; n++) {
+        fgetpos(sptr_fin,&tmp1);
+		fsetpos(sptr_fin,&tmp2);
 
         for (m = j, p = 0, i_ch = 0, l = j; (j < l + ui_col); j++, p++) {
 
@@ -421,8 +421,8 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, size_t start, siz
                 return;
         }
 
-        tmp2 = ftell(sptr_fin);
-        fseek(sptr_fin, tmp1, SEEK_SET);
+        fgetpos(sptr_fin,&tmp2);
+        fsetpos(sptr_fin,&tmp1);
 
         for (j = m, i = 0, l = j; j < l + ui_col; j++) {
 
