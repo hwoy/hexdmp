@@ -395,12 +395,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
         fgetpos(sptr_fin,&tmp2);
         fsetpos(sptr_fin,&tmp1);
 
-        for (j = m, i = 0, l = j; j < l + ui_col; j++) {
-
-            if ((i_ch = fgetc(sptr_fin)) == EOF || (j >= length && (length != -1))) {
-                putchar('\n');
-                return;
-            }
+        for (j = m, i = 0, l = j; (j < l + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (j < length || length == -1)); j++) {
 
             if ((k = findStdC(i_ch, carr_stdc)) > -1)
                 printf("\\%c%c", carr_stdc_str[k], DELIM);
