@@ -354,11 +354,11 @@ findStdC(int ch, const char* stdc)
     return -1;
 }
 
-static size_t printlinechar(FILE *sptr_fin,char *carr_buff,
+static size_t printlinechar(FILE *sptr_fin,
 				const unsigned int ui_col,
 				const fpos_t start,
 				const size_t length,
-				size_t j)
+				size_t j,const char *carr_stdc,const char *carr_stdc_str)
 {
 	size_t l;
 	int i_ch,k;
@@ -394,7 +394,7 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 		
 		printaddress(carr_buff,ui_col,start,j);
 		
-		j=printlinechar(sptr_fin,carr_buff,ui_col,start,length,j);
+		j=printlinechar(sptr_fin,ui_col,start,length,j,carr_stdc,carr_stdc_str);
 		
         putchar('\n');
 		
@@ -450,8 +450,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
         fgetpos(sptr_fin,&tmp2);
         fsetpos(sptr_fin,&tmp1);
 		
-
-		j=printlinechar(sptr_fin,carr_buff,ui_col,start,length,m);
+		j=printlinechar(sptr_fin,ui_col,start,length,m,carr_stdc,carr_stdc_str);
 
 		putchar('\n');
 
