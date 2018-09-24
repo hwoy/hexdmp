@@ -28,13 +28,13 @@ static int
 showErr(const char* err[], unsigned int index);
 
 static void
-dumpByte(FILE *sptr_fin,char* carr_buff, const unsigned int ui_col, const unsigned int ui_base, const unsigned int ui_len, const fpos_t start, const size_t length);
+dumpByte(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigned int ui_col, const unsigned int ui_base, const unsigned int ui_len, const fpos_t start, const size_t length);
 
 static void
-dumpChar(FILE *sptr_fin,char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
+dumpChar(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
 
 static void
-dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsigned int ui_base, const unsigned int ui_len, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
+dumpDual(FILE *sptr_fin, const char * const path,  char* carr_buff, const unsigned int ui_col, const unsigned int ui_base, const unsigned int ui_len, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
 
 static const char* cpa_opt[] = { "-b", "-o", "-d", "-h",
     "-c:", "-s:", "-l:", "-B" ,"-A", "-T" , NULL };
@@ -205,15 +205,15 @@ int main(int argc, const char* argv[])
 			{
 
 				case e_optascii:
-					dumpChar(sptr_fin,carr_buff, ui_col, ui_start, st_length, carr_stdc, carr_stdc_str);
+					dumpChar(sptr_fin, carr_buff, carr_buff, ui_col, ui_start, st_length, carr_stdc, carr_stdc_str);
 					break;
 
 				case e_opttwoside:
-					dumpDual(sptr_fin,carr_buff, ui_col, ui_base, ui_len, ui_start, st_length, carr_stdc, carr_stdc_str);
+					dumpDual(sptr_fin, carr_buff, carr_buff, ui_col, ui_base, ui_len, ui_start, st_length, carr_stdc, carr_stdc_str);
 					break;
 
 				default:
-					dumpByte(sptr_fin,carr_buff, ui_col, ui_base, ui_len, ui_start, st_length);
+					dumpByte(sptr_fin, carr_buff, carr_buff, ui_col, ui_base, ui_len, ui_start, st_length);
             }
 			
 			fclose(sptr_fin);
@@ -257,14 +257,14 @@ showErr(const char* err[], unsigned int index)
     return -1 * (++index);
 }
 
-static void printoutheader(const char *carr_buff, const int fchar, const unsigned int length)
+static void printoutheader(const char * const path, const int fchar, const unsigned int length)
 {
 	unsigned int i;
 	
     for (i = 0; i < length; i++)
         putchar(fchar);
 
-    printf(" %s ", basename(carr_buff));
+    printf(" %s ", basename(path));
 
     for (i = 0; i < length; i++)
         putchar('=');
@@ -303,7 +303,7 @@ static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 }
 
 static void
-dumpByte(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsigned int ui_base,
+dumpByte(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigned int ui_col, const unsigned int ui_base,
     const unsigned int ui_len,
     const fpos_t start,
     const size_t length)
@@ -311,7 +311,7 @@ dumpByte(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsig
     size_t raddress=0;
 	int ch;
 	
-	printoutheader(carr_buff,FCHAR,DLENGTH);
+	printoutheader(path,FCHAR,DLENGTH);
 
 
     if (fsetpos(sptr_fin,&start))
@@ -366,12 +366,12 @@ static size_t printlinechar(FILE *sptr_fin,
 }
 
 static void
-dumpChar(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str)
+dumpChar(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str)
 {
     size_t raddress=0;
 	int ch;
 
-	printoutheader(carr_buff,FCHAR,DLENGTH);
+	printoutheader(path,FCHAR,DLENGTH);
 
     if (fsetpos(sptr_fin,&start))
         return;
@@ -391,7 +391,7 @@ dumpChar(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 }
 
 static void
-dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col,
+dumpDual(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigned int ui_col,
 		const unsigned int ui_base, const unsigned int ui_len,
 		const fpos_t start, const size_t length,
 		const char *carr_stdc,const char *carr_stdc_str)
@@ -401,7 +401,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col,
     fpos_t begpos, curpos;
 	int ch;
 
-	printoutheader(carr_buff,FCHAR,DLENGTH);
+	printoutheader(path,FCHAR,DLENGTH);
 
     if (fsetpos(sptr_fin,&start))
 		return;
