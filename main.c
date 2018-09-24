@@ -17,7 +17,6 @@
 
 #define DCOLTWOSIDE 8
 
-static void printoutheader(char *carr_buff,int fchar,unsigned int length);
 static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret);
 static const char *
@@ -36,9 +35,6 @@ static void
 dumpChar(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, fpos_t start, size_t length);
 static void
 dumpDual(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, fpos_t start, size_t length);
-
-static int
-findStdC(int ch, const char* stdc);
 
 static const char carr_hexpref[] = "0x";
 static const char carr_DSEPERATE[] = " | ";
@@ -270,6 +266,19 @@ showErr(const char* err[], unsigned int index)
     return -1 * (++index);
 }
 
+static void printoutheader(char *carr_buff,int fchar,unsigned int length)
+{
+	unsigned int i;
+    for (i = 0; i < length; i++)
+        putchar(fchar);
+
+    printf(" %s ", basename(carr_buff));
+
+    for (i = 0; i < length; i++)
+        putchar('=');
+    putchar('\n');
+}
+
 size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 				const unsigned int ui_col,
 				const unsigned int ui_base,
@@ -326,6 +335,18 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
 	}while( !feof(sptr_fin) && (j < length || length == -1));
 		
     putchar('\n');
+}
+
+static int
+findStdC(int ch, const char* stdc)
+{
+    int i;
+    for (i = 0; (stdc[i] != 0) || ((stdc[i + 1] != 0)); i++) {
+        if (ch == stdc[i])
+            return i;
+    }
+
+    return -1;
 }
 
 size_t printlinechar(FILE *sptr_fin,char *carr_buff,
@@ -385,7 +406,7 @@ static void
 dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
     unsigned int i, k;
-    size_t n, j, m, p;
+    size_t j, m, p;
     fpos_t tmp1, tmp2;
 
 	printoutheader(carr_buff,FCHAR,DLENGTH);
@@ -393,7 +414,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
     if (fsetpos(sptr_fin,&start))
 		return;
 
-	fgetpos(sptr_fin,&tmp1);fgetpos(sptr_fin,&tmp2); j = 0; n = 0;
+	fgetpos(sptr_fin,&tmp1);fgetpos(sptr_fin,&tmp2); j = 0;
 	
     do {
 		
@@ -412,7 +433,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 		j=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,start,length,j);
 		p=j-m;
 
-        if (!n && p < ui_col && p > 0)
+        if (!m && p < ui_col && p > 0)
             printf(carr_DSEPERATE);
 
         else {
@@ -437,31 +458,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 		putchar('\n');
 
 		
-    }while(n++,(!feof(sptr_fin) && (j < length || length == -1)));
+    }while((!feof(sptr_fin) && (j < length || length == -1)));
 
 }
 
-static int
-findStdC(int ch, const char* stdc)
-{
-    int i;
-    for (i = 0; (stdc[i] != 0) || ((stdc[i + 1] != 0)); i++) {
-        if (ch == stdc[i])
-            return i;
-    }
-
-    return -1;
-}
-
-static void printoutheader(char *carr_buff,int fchar,unsigned int length)
-{
-	unsigned int i;
-    for (i = 0; i < length; i++)
-        putchar(fchar);
-
-    printf(" %s ", basename(carr_buff));
-
-    for (i = 0; i < length; i++)
-        putchar('=');
-    putchar('\n');
-}
