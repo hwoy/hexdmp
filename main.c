@@ -320,6 +320,7 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
     size_t length)
 {
     size_t j=0;
+	int ch;
 	
 	printoutheader(carr_buff,FCHAR,DLENGTH);
 
@@ -327,8 +328,10 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
     if (fsetpos(sptr_fin,&start))
         return;
 
-    while( !feof(sptr_fin) && (j < length || length == -1))
-	{
+    while((ch=fgetc(sptr_fin))!=EOF && (j < length || length == -1)) {
+		
+		ungetc(ch,sptr_fin);
+		
 		printaddress(carr_buff,ui_col,start,j);
 		
 		j=printlinebyte(sptr_fin,carr_buff,ui_col,ui_base,ui_len,start,length,j);
@@ -378,14 +381,17 @@ static void
 dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
     size_t j=0;
+	int ch;
 
 	printoutheader(carr_buff,FCHAR,DLENGTH);
 
     if (fsetpos(sptr_fin,&start))
         return;
 
-    while( !feof(sptr_fin) && (j < length || length == -1)) 
-	{
+    while((ch=fgetc(sptr_fin))!=EOF && (j < length || length == -1)) {
+		
+		ungetc(ch,sptr_fin);
+		
 		printaddress(carr_buff,ui_col,start,j);
 		
 		j=printlinechar(sptr_fin,carr_buff,ui_col,start,length,j);
@@ -402,6 +408,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
     unsigned int i, k;
     size_t j, m, p;
     fpos_t tmp1, tmp2;
+	int ch;
 
 	printoutheader(carr_buff,FCHAR,DLENGTH);
 
@@ -410,7 +417,9 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 
 	fgetpos(sptr_fin,&tmp1);fgetpos(sptr_fin,&tmp2); j = 0;
 	
-    while((!feof(sptr_fin) && (j < length || length == -1))) {
+    while((ch=fgetc(sptr_fin))!=EOF && (j < length || length == -1)) {
+		
+		ungetc(ch,sptr_fin);
 		
         fgetpos(sptr_fin,&tmp1);
 		fsetpos(sptr_fin,&tmp2);
