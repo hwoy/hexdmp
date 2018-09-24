@@ -125,27 +125,18 @@ int main(int argc, const char* argv[])
         case e_optoct:
             ui_base = 8;
             ui_len = 3;
-
-            if (!ui_colflag)
-                ui_col = DCOLTWOSIDE;
-
+			
             break;
 
         case e_optdec:
             ui_base = 10;
-            ui_len = 3;
-
-            if (!ui_colflag)
-                ui_col = DCOLTWOSIDE;
+            ui_len = 3;		
 
             break;
 
         case e_opthex:
             ui_base = 16;
             ui_len = 2;
-
-            if (!ui_colflag)
-                ui_col = DCOLTWOSIDE;
 
             break;
 
