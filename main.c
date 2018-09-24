@@ -58,9 +58,9 @@ static const char* cpa_optdes[] = {
     "{n} n=number of column",
     "{n} n=offset",
     "{n} n=Length",
-	" Byte View",
-    " ASCII View",
-    " Dual view",
+	" Byte view Mode",
+    " ASCII view Mode",
+    " Two column view Mode",
     NULL };
 
 static const char* cpa_err[] = { 
@@ -291,7 +291,7 @@ static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 	const size_t beginraddress=raddress;
 	int ch;
 	
-	for ( ; (raddress < beginraddress + ui_col) && ((ch = fgetc(sptr_fin)) != EOF && (raddress < length || length == -1)); ++raddress)
+	for ( ; (raddress < beginraddress + ui_col) && (raddress < length || length == -1)&& ((ch = fgetc(sptr_fin)) != EOF); ++raddress)
 	{
 
         ui2s(ch, carr_buff, BSIZE, ui_base, ui_len);
@@ -317,7 +317,7 @@ dumpByte(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsig
     if (fsetpos(sptr_fin,&start))
         return;
 
-    while((ch=fgetc(sptr_fin))!=EOF && (raddress < length || length == -1)) {
+    while((raddress < length || length == -1)&&(ch=fgetc(sptr_fin))!=EOF) {
 		
 		ungetc(ch,sptr_fin);
 		
@@ -351,7 +351,7 @@ static size_t printlinechar(FILE *sptr_fin,
 	const size_t beginraddress = raddress;
 	int ch,k;
 	
-	for ( ; (raddress < beginraddress + ui_col) && ((ch = fgetc(sptr_fin)) != EOF && (raddress < length || length == -1)); ++raddress)
+	for ( ; (raddress < beginraddress + ui_col) && (raddress < length || length == -1) && ((ch = fgetc(sptr_fin)) != EOF); ++raddress)
 	{
 
         if ((k = findStdC(ch, carr_stdc)) > -1)
@@ -376,7 +376,7 @@ dumpChar(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
     if (fsetpos(sptr_fin,&start))
         return;
 
-    while((ch=fgetc(sptr_fin))!=EOF && (raddress < length || length == -1)) {
+    while((raddress < length || length == -1)&&(ch=fgetc(sptr_fin))!=EOF) {
 		
 		ungetc(ch,sptr_fin);
 		
@@ -408,7 +408,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col,
 
 	fgetpos(sptr_fin,&curpos);
 	
-    while((ch=fgetc(sptr_fin))!=EOF && (raddress < length || length == -1)) {
+    while((raddress < length || length == -1)&&(ch=fgetc(sptr_fin))!=EOF) {
 		
 		ungetc(ch,sptr_fin);
 		
