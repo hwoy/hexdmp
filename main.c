@@ -25,16 +25,13 @@ static int
 showErr(const char* err[], unsigned int index);
 
 static void
-dumpByte(FILE *sptr_fin,char* carr_buff,
-    unsigned int ui_col,
-    unsigned int ui_base,
-    unsigned int ui_len,
-    fpos_t start,
-    size_t length);
+dumpByte(FILE *sptr_fin,char* carr_buff, const unsigned int ui_col, const unsigned int ui_base, const unsigned int ui_len, const fpos_t start, const size_t length);
+
 static void
-dumpChar(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, fpos_t start, size_t length);
+dumpChar(FILE *sptr_fin,char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length);
+
 static void
-dumpDual(FILE *sptr_fin,char* carr_buff, unsigned int ui_col, fpos_t start, size_t length);
+dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length);
 
 static const char carr_hexpref[] = "0x";
 static const char carr_DSEPERATE[] = " | ";
@@ -268,7 +265,7 @@ showErr(const char* err[], unsigned int index)
     return -1 * (++index);
 }
 
-static void printoutheader(const char *carr_buff,int fchar,unsigned int length)
+static void printoutheader(const char *carr_buff, const int fchar, const unsigned int length)
 {
 	unsigned int i;
 	
@@ -295,8 +292,7 @@ static void printaddress(char *carr_buff,const unsigned int ui_col,const fpos_t 
 
 static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 				const unsigned int ui_col,
-				const unsigned int ui_base,
-				const unsigned int ui_len,
+				const unsigned int ui_base, const unsigned int ui_len,
 				const fpos_t start,
 				const size_t length,
 				size_t raddress)
@@ -316,12 +312,10 @@ static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 }
 
 static void
-dumpByte(FILE *sptr_fin, char* carr_buff,
-    unsigned int ui_col,
-    unsigned int ui_base,
-    unsigned int ui_len,
-    fpos_t start,
-    size_t length)
+dumpByte(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsigned int ui_base,
+    const unsigned int ui_len,
+    const fpos_t start,
+    const size_t length)
 {
     size_t raddress=0;
 	int ch;
@@ -382,7 +376,7 @@ static size_t printlinechar(FILE *sptr_fin,
 }
 
 static void
-dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
+dumpChar(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length)
 {
     size_t raddress=0;
 	int ch;
@@ -407,7 +401,7 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 }
 
 static void
-dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
+dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length)
 {
     unsigned int i, k;
     size_t raddress, beginraddress, column;
