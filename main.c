@@ -346,8 +346,8 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 static void
 dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
-    unsigned int i, n, p, l, m;
-    size_t j;
+    unsigned int i, j, p, l, m;
+    size_t n;
     int i_ch;
     int k;
     fpos_t tmp1, tmp2;
@@ -355,10 +355,11 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 	printoutheader(carr_buff,FCHAR,DLENGTH);
 
     if (fsetpos(sptr_fin,&start))
-        return;
+		return;
 
-    for (fgetpos(sptr_fin,&tmp1),fgetpos(sptr_fin,&tmp2), j = 0, m = 0, n = 0;; n++) {
-		
+	fgetpos(sptr_fin,&tmp1);fgetpos(sptr_fin,&tmp2); j = 0; m = 0; n = 0;
+	
+    do {
 		
         fgetpos(sptr_fin,&tmp1);
 		fsetpos(sptr_fin,&tmp2);
@@ -406,7 +407,8 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 			if (!(i=(i+1)%ui_col))
 				putchar('\n');
         }
-    }
+		
+    }while(n++,(i_ch != EOF && (j < length || length == -1)));
 
 }
 
