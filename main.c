@@ -118,7 +118,7 @@ int main(int argc, const char* argv[])
             ui_len = 8;
 
             if (!ui_colflag)
-                ui_col = DCOLTWOSIDE/2;
+                ui_col = 4;
 
             break;
 
