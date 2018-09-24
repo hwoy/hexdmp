@@ -36,13 +36,14 @@ dumpChar(FILE *sptr_fin,char* carr_buff, const unsigned int ui_col, const fpos_t
 static void
 dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsigned int ui_base, const unsigned int ui_len, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
 
-static const char* cpa_opt[] = { "-b", "-o", "-d", "-h", "-a",
-    "-c:", "-s:", "-l:", "-t", NULL };
+static const char* cpa_opt[] = { "-b", "-o", "-d", "-h", "-B" ,"-A",
+    "-c:", "-s:", "-l:", "-T" , NULL };
 enum _opt {
     e_optbin,
     e_optoct,
     e_optdec,
     e_opthex,
+	e_optbyte,
     e_optascii,
     e_optcol,
     e_optstart,
@@ -54,6 +55,7 @@ static const char* cpa_optdes[] = {
     " Octal Show",
     " 10 base Show (Decimal)",
     " Hex Show",
+	" Byte Show",
     " ASCII Show",
     "{n} n=number of column",
     "{n} n=offset",
@@ -116,9 +118,8 @@ int main(int argc, const char* argv[])
             ui_len = 8;
 
             if (!ui_colflag)
-                ui_col = 8;
+                ui_col = 4;
 
-            i_actIndex = -1;
             break;
 
         case e_optoct:
@@ -128,7 +129,6 @@ int main(int argc, const char* argv[])
             if (!ui_colflag)
                 ui_col = 8;
 
-            i_actIndex = -1;
             break;
 
         case e_optdec:
@@ -136,9 +136,8 @@ int main(int argc, const char* argv[])
             ui_len = 3;
 
             if (!ui_colflag)
-                ui_col = 10;
+                ui_col = 8;
 
-            i_actIndex = -1;
             break;
 
         case e_opthex:
@@ -146,11 +145,14 @@ int main(int argc, const char* argv[])
             ui_len = 2;
 
             if (!ui_colflag)
-                ui_col = 16;
+                ui_col = 8;
 
-            i_actIndex = -1;
             break;
 
+        case e_optbyte:
+            i_actIndex = e_optbyte;
+            break;
+			
         case e_optascii:
             i_actIndex = e_optascii;
             break;
@@ -198,10 +200,8 @@ int main(int argc, const char* argv[])
 
             i_actIndex = e_opttwoside;
 
-            if (!ui_colflag)
-                ui_col = DCOLTWOSIDE;
-
             break;
+	
 
         case e_optother:
 		
@@ -218,7 +218,7 @@ int main(int argc, const char* argv[])
 					break;
 
 				case e_opttwoside:
-					dumpDual(sptr_fin,carr_buff, ui_col, BASE, LEN, ui_start, ui_length, carr_stdc, carr_stdc_str);
+					dumpDual(sptr_fin,carr_buff, ui_col, ui_base, ui_len, ui_start, ui_length, carr_stdc, carr_stdc_str);
 					break;
 
 				default:
