@@ -11,11 +11,14 @@
 
 #define FCHAR '='
 
-#define OFFLEN (sizeof(fpos_t) * 8 / 4)
+#define OFFLEN (sizeof(size_t) * 8 / 4)
 #define OFFBASE 16
 #define DLENGTH 2
 
 #define DCOLTWOSIDE 8
+
+#define carr_hexpref "0x"
+#define carr_DSEPERATE " | "
 
 static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret);
@@ -32,9 +35,6 @@ dumpChar(FILE *sptr_fin,char* carr_buff, const unsigned int ui_col, const fpos_t
 
 static void
 dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
-
-static const char carr_hexpref[] = "0x";
-static const char carr_DSEPERATE[] = " | ";
 
 static const char* cpa_opt[] = { "-b", "-o", "-d", "-h", "-a",
     "-c:", "-s:", "-l:", "-t", NULL };
