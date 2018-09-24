@@ -240,10 +240,11 @@ showHelp(const char* path, const char* opt[], const char* optdes[], int ret)
     unsigned int i;
     fprintf(stderr, "\nUSAGE: %s {option} file\n\n", basename(path));
 
-    fprintf(stderr, "OPTIONS\n");
-    for (i = 0; opt[i] && optdes[i]; i++) {
+    fprintf(stderr, "OPTIONS\n\n");
+	
+    for (i = 0; opt[i] && optdes[i]; i++)
         fprintf(stderr, "%s%s\n", opt[i], optdes[i]);
-    }
+
     fputc('\n', stderr);
 
     return ret;
@@ -269,6 +270,7 @@ showErr(const char* err[], unsigned int index)
 static void printoutheader(const char *carr_buff,int fchar,unsigned int length)
 {
 	unsigned int i;
+	
     for (i = 0; i < length; i++)
         putchar(fchar);
 
@@ -276,6 +278,7 @@ static void printoutheader(const char *carr_buff,int fchar,unsigned int length)
 
     for (i = 0; i < length; i++)
         putchar('=');
+	
     putchar('\n');
 }
 
@@ -346,10 +349,10 @@ static int
 findStdC(int ch, const char* stdc)
 {
     int i;
-    for (i = 0; (stdc[i] != 0) || ((stdc[i + 1] != 0)); i++) {
+    for (i = 0; (stdc[i] != 0) || ((stdc[i + 1] != 0)); i++)
         if (ch == stdc[i])
             return i;
-    }
+
 
     return -1;
 }
