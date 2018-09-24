@@ -270,6 +270,28 @@ showErr(const char* err[], unsigned int index)
     return -1 * (++index);
 }
 
+size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
+				const unsigned int ui_col,
+				const unsigned int ui_base,
+				const unsigned int ui_len,
+				const fpos_t start,
+				const size_t length,
+				size_t j)
+{
+	size_t l;
+	int i_ch;
+	
+	for (l = j; (j < l + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (j < length || length == -1)); ++j)
+	{
+
+        ui2s(i_ch, carr_buff, BSIZE, ui_base, ui_len);
+        printf("%s%c", carr_buff, DELIM);
+
+	}
+	
+	return j;
+}
+
 static void
 dumpByte(FILE *sptr_fin, char* carr_buff,
     unsigned int ui_col,
@@ -278,9 +300,7 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
     fpos_t start,
     size_t length)
 {
-    unsigned int i;
-    size_t j;
-    int i_ch;
+    size_t j=0;
 	
 	printoutheader(carr_buff,FCHAR,DLENGTH);
 
@@ -288,68 +308,84 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
     if (fsetpos(sptr_fin,&start))
         return;
 
-    for (i = 0, j = 0; ((i_ch = fgetc(sptr_fin)) != EOF) && (j < length || length == -1); j++) {
-
-
-        if (!(j % ui_col)) {
+    do 
+	{
+		if (!(j % ui_col)) {
 
             sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
             printf("%s: ", carr_buff);
         }
-
-        ui2s(i_ch, carr_buff, BSIZE, ui_base, ui_len);
-        printf("%s%c", carr_buff, DELIM);
-
-        if (!(i=(i+1)%ui_col))
-            putchar('\n');
-
-    }
+		
+		j=printlinebyte(sptr_fin,carr_buff,ui_col,ui_base,ui_len,start,length,j);
+		
+        putchar('\n');
+		
+		
+		
+	}while( !feof(sptr_fin) && (j < length || length == -1));
+		
     putchar('\n');
 }
 
-static void
-dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
+size_t printlinechar(FILE *sptr_fin,char *carr_buff,
+				const unsigned int ui_col,
+				const fpos_t start,
+				const size_t length,
+				size_t j)
 {
-    unsigned int i;
-    size_t j;
-    int i_ch;
-    int k;
+	size_t l;
+	int i_ch,k;
+	
+	for (l = j; (j < l + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (j < length || length == -1)); ++j)
+	{
 
-	printoutheader(carr_buff,FCHAR,DLENGTH);
-
-    if (fsetpos(sptr_fin,&start))
-        return;
-
-    for (i = 0, j = 0; ((i_ch = fgetc(sptr_fin)) != EOF) && (j < length || length == -1); j++) {
-
-		
-        if (!(j % ui_col)) {
-
-            sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-
-            printf("%s: ", carr_buff);
-        }
-		
         if ((k = findStdC(i_ch, carr_stdc)) > -1)
             printf("\\%c%c", carr_stdc_str[k], DELIM);
 
         else
             printf(" %c%c", i_ch, DELIM);
 
-        if (!(i=(i+1)%ui_col))
-            putchar('\n');
-    }
+	}
+	
+	return j;
+}
+
+static void
+dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
+{
+    size_t j=0;
+
+	printoutheader(carr_buff,FCHAR,DLENGTH);
+
+    if (fsetpos(sptr_fin,&start))
+        return;
+
+    do 
+	{
+		if (!(j % ui_col)) {
+
+            sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+
+            printf("%s: ", carr_buff);
+        }
+		
+		j=printlinechar(sptr_fin,carr_buff,ui_col,start,length,j);
+		
+        putchar('\n');
+		
+		
+		
+	}while( !feof(sptr_fin) && (j < length || length == -1));
+	
     putchar('\n');
 }
 
 static void
 dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
-    unsigned int i, p;
-    size_t n, j, m, l;
-    int i_ch;
-    int k;
+    unsigned int i, k;
+    size_t n, j, m, p;
     fpos_t tmp1, tmp2;
 
 	printoutheader(carr_buff,FCHAR,DLENGTH);
@@ -357,25 +393,24 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
     if (fsetpos(sptr_fin,&start))
 		return;
 
-	fgetpos(sptr_fin,&tmp1);fgetpos(sptr_fin,&tmp2); j = 0; m = 0; n = 0;
+	fgetpos(sptr_fin,&tmp1);fgetpos(sptr_fin,&tmp2); j = 0; n = 0;
 	
     do {
 		
         fgetpos(sptr_fin,&tmp1);
 		fsetpos(sptr_fin,&tmp2);
+		
+		m=j;
+		
+		if (!(j % ui_col)) {
 
-        for (m = j, p = 0, i_ch = 0, l = j; (j < l + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (j < length || length == -1)) ; j++, p++) {
+            sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
-            if (!(j % ui_col)) {
-
-                sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-
-                printf("%s: ", carr_buff);
-            }
-
-            ui2s(i_ch, carr_buff, BSIZE, BASE, LEN);
-            printf("%s%c", carr_buff, DELIM);
+            printf("%s: ", carr_buff);
         }
+		
+		j=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,start,length,j);
+		p=j-m;
 
         if (!n && p < ui_col && p > 0)
             printf(carr_DSEPERATE);
@@ -395,20 +430,14 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 
         fgetpos(sptr_fin,&tmp2);
         fsetpos(sptr_fin,&tmp1);
-
-        for (j = m, i = 0, l = j; (j < l + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (j < length || length == -1)); j++) {
-
-            if ((k = findStdC(i_ch, carr_stdc)) > -1)
-                printf("\\%c%c", carr_stdc_str[k], DELIM);
-
-            else
-                printf(" %c%c", i_ch, DELIM);
-
-			if (!(i=(i+1)%ui_col))
-				putchar('\n');
-        }
 		
-    }while(n++,(i_ch != EOF && (j < length || length == -1)));
+
+		j=printlinechar(sptr_fin,carr_buff,ui_col,start,length,m);
+
+		putchar('\n');
+
+		
+    }while(n++,(!feof(sptr_fin) && (j < length || length == -1)));
 
 }
 
