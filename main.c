@@ -298,12 +298,12 @@ static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 				size_t raddress)
 {
 	const size_t beginraddress=raddress;
-	int i_ch;
+	int ch;
 	
-	for ( ; (raddress < beginraddress + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (raddress < length || length == -1)); ++raddress)
+	for ( ; (raddress < beginraddress + ui_col) && ((ch = fgetc(sptr_fin)) != EOF && (raddress < length || length == -1)); ++raddress)
 	{
 
-        ui2s(i_ch, carr_buff, BSIZE, ui_base, ui_len);
+        ui2s(ch, carr_buff, BSIZE, ui_base, ui_len);
         printf("%s%c", carr_buff, DELIM);
 
 	}
@@ -359,16 +359,16 @@ static size_t printlinechar(FILE *sptr_fin,
 				size_t raddress,const char *carr_stdc,const char *carr_stdc_str)
 {
 	const size_t beginraddress = raddress;
-	int i_ch,k;
+	int ch,k;
 	
-	for ( ; (raddress < beginraddress + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (raddress < length || length == -1)); ++raddress)
+	for ( ; (raddress < beginraddress + ui_col) && ((ch = fgetc(sptr_fin)) != EOF && (raddress < length || length == -1)); ++raddress)
 	{
 
-        if ((k = findStdC(i_ch, carr_stdc)) > -1)
+        if ((k = findStdC(ch, carr_stdc)) > -1)
             printf("\\%c%c", carr_stdc_str[k], DELIM);
 
         else
-            printf(" %c%c", i_ch, DELIM);
+            printf(" %c%c", ch, DELIM);
 
 	}
 	
@@ -403,7 +403,7 @@ dumpChar(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 static void
 dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length)
 {
-    unsigned int i, k;
+    unsigned int i, j;
     size_t raddress, beginraddress, column;
     fpos_t begpos, curpos;
 	int ch;
@@ -436,7 +436,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 
             if ((raddress % ui_col) && (ui_col < length) && (((raddress <= length) && (length != -1)) || (length == -1)))
                 for (i = 0; i < (ui_col - raddress % ui_col); i++)
-                    for (k = 0; k < LEN + 1; k++)
+                    for (j = 0; j < LEN + 1; j++)
                         printf("%c", DELIM);
 
             if (column)
