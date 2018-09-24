@@ -52,15 +52,16 @@ enum _opt {
     e_optlength,
     e_opttwoside
 };
-static const char* cpa_optdes[] = { "-b Binary show",
-    "-o Octal Show",
-    "-d 10 base Show (Decimal)",
-    "-h Hex Show",
-    "-a ASCII Show",
-    "-c:{n} n=number of column",
-    "-s:{n} n=offset",
-    "-l:{n} n=Length",
-    "-t Dual view",
+static const char* cpa_optdes[] = {
+	" Binary show",
+    " Octal Show",
+    " 10 base Show (Decimal)",
+    " Hex Show",
+    " ASCII Show",
+    "{n} n=number of column",
+    "{n} n=offset",
+    "{n} n=Length",
+    " Dual view",
     NULL };
 
 static const char* cpa_err[] = { "Parameter isn't an unsigned interger",
@@ -242,7 +243,7 @@ showHelp(const char* path, const char* opt[], const char* optdes[], int ret)
 
     fprintf(stderr, "OPTIONS\n");
     for (i = 0; opt[i] && optdes[i]; i++) {
-        fprintf(stderr, "%s =\t%s\n", opt[i], optdes[i]);
+        fprintf(stderr, "%s%s\n", opt[i], optdes[i]);
     }
     fputc('\n', stderr);
 
