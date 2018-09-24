@@ -236,7 +236,7 @@ static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret)
 {
     unsigned int i;
-    fprintf(stderr, "\nUSAGE: %s {option} file\n\n", basename(path));
+    fprintf(stderr, "\nUSAGE: %s {option} file1 file2 ..file(n)\n\n", basename(path));
 
     fprintf(stderr, "OPTIONS\n\n");
 	
