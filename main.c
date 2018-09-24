@@ -410,7 +410,7 @@ static void
 dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
     unsigned int i, k;
-    size_t raddress, tmpraddress, diffaddress;
+    size_t raddress, beginraddress, column;
     fpos_t tmp1, tmp2;
 	int ch;
 
@@ -428,14 +428,14 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
         fgetpos(sptr_fin,&tmp1);
 		fsetpos(sptr_fin,&tmp2);
 		
-		tmpraddress=raddress;
+		beginraddress=raddress;
 		
 		printaddress(carr_buff,ui_col,start,raddress);
 		
 		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,start,length,raddress);
-		diffaddress=raddress-tmpraddress;
+		column=raddress-beginraddress;
 
-        if (!tmpraddress && diffaddress < ui_col && diffaddress > 0)
+        if (!beginraddress && column && column < ui_col)
             printf(carr_DSEPERATE);
 
         else {
@@ -445,7 +445,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
                     for (k = 0; k < LEN + 1; k++)
                         printf("%c", DELIM);
 
-            if (diffaddress)
+            if (column)
                 printf(carr_DSEPERATE);
             else
                 return;
@@ -454,7 +454,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
         fgetpos(sptr_fin,&tmp2);
         fsetpos(sptr_fin,&tmp1);
 		
-		raddress=printlinechar(sptr_fin,ui_col,start,length,tmpraddress,carr_stdc,carr_stdc_str);
+		raddress=printlinechar(sptr_fin,ui_col,start,length,beginraddress,carr_stdc,carr_stdc_str);
 
 		putchar('\n');
 
