@@ -86,7 +86,7 @@ int main(int argc, const char* argv[])
 	FILE* sptr_fin;
     unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
     fpos_t ui_start;
-	size_t ui_length;
+	size_t st_length;
     unsigned int i;
     int i_actIndex;
 
@@ -100,7 +100,7 @@ int main(int argc, const char* argv[])
     ui_len = LEN;
     ui_colflag = 0;
     ui_start = 0;
-    ui_length = -1;
+    st_length = -1;
     i_actIndex = e_opttwoside;
 
     /******************* Parameter Operation *********************/
@@ -175,7 +175,7 @@ int main(int argc, const char* argv[])
             }
             i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
 
-            ui_length = s2sT(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
+            st_length = s2sT(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
             break;
 			
@@ -205,15 +205,15 @@ int main(int argc, const char* argv[])
 			{
 
 				case e_optascii:
-					dumpChar(sptr_fin,carr_buff, ui_col, ui_start, ui_length, carr_stdc, carr_stdc_str);
+					dumpChar(sptr_fin,carr_buff, ui_col, ui_start, st_length, carr_stdc, carr_stdc_str);
 					break;
 
 				case e_opttwoside:
-					dumpDual(sptr_fin,carr_buff, ui_col, ui_base, ui_len, ui_start, ui_length, carr_stdc, carr_stdc_str);
+					dumpDual(sptr_fin,carr_buff, ui_col, ui_base, ui_len, ui_start, st_length, carr_stdc, carr_stdc_str);
 					break;
 
 				default:
-					dumpByte(sptr_fin,carr_buff, ui_col, ui_base, ui_len, ui_start, ui_length);
+					dumpByte(sptr_fin,carr_buff, ui_col, ui_base, ui_len, ui_start, st_length);
             }
 			
 			fclose(sptr_fin);
@@ -397,7 +397,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col,
 		const char *carr_stdc,const char *carr_stdc_str)
 {
     unsigned int i, j;
-    size_t raddress, beginraddress, column;
+    size_t raddress = 0, beginraddress, column;
     fpos_t begpos, curpos;
 	int ch;
 
@@ -406,7 +406,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col,
     if (fsetpos(sptr_fin,&start))
 		return;
 
-	fgetpos(sptr_fin,&curpos); raddress = 0;
+	fgetpos(sptr_fin,&curpos);
 	
     while((ch=fgetc(sptr_fin))!=EOF && (raddress < length || length == -1)) {
 		
