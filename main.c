@@ -346,8 +346,8 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 static void
 dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
-    unsigned int i, j, p, l, m;
-    size_t n;
+    unsigned int p;
+    size_t n, i, j, m, l;
     int i_ch;
     int k;
     fpos_t tmp1, tmp2;
