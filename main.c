@@ -405,7 +405,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 {
     unsigned int i, k;
     size_t raddress, beginraddress, column;
-    fpos_t tmp1, tmp2;
+    fpos_t begpos, curpos;
 	int ch;
 
 	printoutheader(carr_buff,FCHAR,DLENGTH);
@@ -413,14 +413,14 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
     if (fsetpos(sptr_fin,&start))
 		return;
 
-	fgetpos(sptr_fin,&tmp2); raddress = 0;
+	fgetpos(sptr_fin,&curpos); raddress = 0;
 	
     while((ch=fgetc(sptr_fin))!=EOF && (raddress < length || length == -1)) {
 		
 		ungetc(ch,sptr_fin);
 		
-        fgetpos(sptr_fin,&tmp1);
-		fsetpos(sptr_fin,&tmp2);
+        fgetpos(sptr_fin,&begpos);
+		fsetpos(sptr_fin,&curpos);
 		
 		beginraddress=raddress;
 		
@@ -445,8 +445,8 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
                 return;
         }
 
-        fgetpos(sptr_fin,&tmp2);
-        fsetpos(sptr_fin,&tmp1);
+        fgetpos(sptr_fin,&curpos);
+        fsetpos(sptr_fin,&begpos);
 		
 		raddress=printlinechar(sptr_fin,ui_col,start,length,beginraddress,carr_stdc,carr_stdc_str);
 
