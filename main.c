@@ -279,7 +279,17 @@ static void printoutheader(char *carr_buff,int fchar,unsigned int length)
     putchar('\n');
 }
 
-size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
+static void printaddress(char *carr_buff,const unsigned int ui_col,const fpos_t start,const size_t j)
+{
+	if (!(j % ui_col)) {
+
+        sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+
+        printf("%s: ", carr_buff);
+    }
+}
+
+static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 				const unsigned int ui_col,
 				const unsigned int ui_base,
 				const unsigned int ui_len,
@@ -319,12 +329,7 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
 
     do 
 	{
-		if (!(j % ui_col)) {
-
-            sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-
-            printf("%s: ", carr_buff);
-        }
+		printaddress(carr_buff,ui_col,start,j);
 		
 		j=printlinebyte(sptr_fin,carr_buff,ui_col,ui_base,ui_len,start,length,j);
 		
@@ -349,7 +354,7 @@ findStdC(int ch, const char* stdc)
     return -1;
 }
 
-size_t printlinechar(FILE *sptr_fin,char *carr_buff,
+static size_t printlinechar(FILE *sptr_fin,char *carr_buff,
 				const unsigned int ui_col,
 				const fpos_t start,
 				const size_t length,
@@ -384,12 +389,7 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 
     do 
 	{
-		if (!(j % ui_col)) {
-
-            sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-
-            printf("%s: ", carr_buff);
-        }
+		printaddress(carr_buff,ui_col,start,j);
 		
 		j=printlinechar(sptr_fin,carr_buff,ui_col,start,length,j);
 		
@@ -423,12 +423,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
 		
 		m=j;
 		
-		if (!(j % ui_col)) {
-
-            sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
-
-            printf("%s: ", carr_buff);
-        }
+		printaddress(carr_buff,ui_col,start,j);
 		
 		j=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,start,length,j);
 		p=j-m;
