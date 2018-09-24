@@ -64,7 +64,8 @@ static const char* cpa_optdes[] = {
     " Dual view",
     NULL };
 
-static const char* cpa_err[] = { "Parameter isn't an unsigned interger",
+static const char* cpa_err[] = { 
+	"Parameter isn't an unsigned interger",
     "File can't be accessed",
     "Column must more than 0",
     NULL };
@@ -75,15 +76,15 @@ enum _err {
     e_errzero
 };
 
-static const char carr_stdc[] = { '\0', '\a', '\b', '\f', '\n',
-    '\r', '\t', '\v', '\0', '\0' };
-static const char carr_stdc_str[] = { '0', 'a', 'b', 'f', 'n',
-    'r', 't', 'v', '\0' };
+static const char carr_stdc[] = { '\0', '\a', '\b', '\f', '\n','\r', '\t', '\v', '\0', '\0' };
+
+static const char carr_stdc_str[] = { '0', 'a', 'b', 'f', 'n','r', 't', 'v', '\0' };
 
 int main(int argc, const char* argv[])
 {
+	static char carr_buff[BSIZE];
+	
 	FILE* sptr_fin;
-    static char carr_buff[BSIZE];
     unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
     fpos_t ui_start;
 	size_t ui_length;
