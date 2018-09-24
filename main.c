@@ -228,7 +228,6 @@ int main(int argc, const char* argv[])
 			
 			fclose(sptr_fin);
 
-            break;
         }
     }
 
@@ -280,11 +279,11 @@ static void printoutheader(const char *carr_buff,int fchar,unsigned int length)
     putchar('\n');
 }
 
-static void printaddress(char *carr_buff,const unsigned int ui_col,const fpos_t start,const size_t j)
+static void printaddress(char *carr_buff,const unsigned int ui_col,const fpos_t start,const size_t raddress)
 {
-	if (!(j % ui_col)) {
+	if (!(raddress % ui_col)) {
 
-        sT2s(j + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
+        sT2s(raddress + start, carr_buff, BSIZE, OFFBASE, OFFLEN);
 
         printf("%s: ", carr_buff);
     }
@@ -296,12 +295,12 @@ static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 				const unsigned int ui_len,
 				const fpos_t start,
 				const size_t length,
-				size_t j)
+				size_t raddress)
 {
-	size_t l;
+	const size_t beginraddress=raddress;
 	int i_ch;
 	
-	for (l = j; (j < l + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (j < length || length == -1)); ++j)
+	for ( ; (raddress < beginraddress + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (raddress < length || length == -1)); ++raddress)
 	{
 
         ui2s(i_ch, carr_buff, BSIZE, ui_base, ui_len);
@@ -309,7 +308,7 @@ static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 
 	}
 	
-	return j;
+	return raddress;
 }
 
 static void
@@ -320,7 +319,7 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
     fpos_t start,
     size_t length)
 {
-    size_t j=0;
+    size_t raddress=0;
 	int ch;
 	
 	printoutheader(carr_buff,FCHAR,DLENGTH);
@@ -329,13 +328,13 @@ dumpByte(FILE *sptr_fin, char* carr_buff,
     if (fsetpos(sptr_fin,&start))
         return;
 
-    while((ch=fgetc(sptr_fin))!=EOF && (j < length || length == -1)) {
+    while((ch=fgetc(sptr_fin))!=EOF && (raddress < length || length == -1)) {
 		
 		ungetc(ch,sptr_fin);
 		
-		printaddress(carr_buff,ui_col,start,j);
+		printaddress(carr_buff,ui_col,start,raddress);
 		
-		j=printlinebyte(sptr_fin,carr_buff,ui_col,ui_base,ui_len,start,length,j);
+		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,ui_base,ui_len,start,length,raddress);
 		
         putchar('\n');
 			
@@ -359,12 +358,12 @@ static size_t printlinechar(FILE *sptr_fin,
 				const unsigned int ui_col,
 				const fpos_t start,
 				const size_t length,
-				size_t j,const char *carr_stdc,const char *carr_stdc_str)
+				size_t raddress,const char *carr_stdc,const char *carr_stdc_str)
 {
-	size_t l;
+	const size_t beginraddress = raddress;
 	int i_ch,k;
 	
-	for (l = j; (j < l + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (j < length || length == -1)); ++j)
+	for ( ; (raddress < beginraddress + ui_col) && ((i_ch = fgetc(sptr_fin)) != EOF && (raddress < length || length == -1)); ++raddress)
 	{
 
         if ((k = findStdC(i_ch, carr_stdc)) > -1)
@@ -375,13 +374,13 @@ static size_t printlinechar(FILE *sptr_fin,
 
 	}
 	
-	return j;
+	return raddress;
 }
 
 static void
 dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
-    size_t j=0;
+    size_t raddress=0;
 	int ch;
 
 	printoutheader(carr_buff,FCHAR,DLENGTH);
@@ -389,13 +388,13 @@ dumpChar(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
     if (fsetpos(sptr_fin,&start))
         return;
 
-    while((ch=fgetc(sptr_fin))!=EOF && (j < length || length == -1)) {
+    while((ch=fgetc(sptr_fin))!=EOF && (raddress < length || length == -1)) {
 		
 		ungetc(ch,sptr_fin);
 		
-		printaddress(carr_buff,ui_col,start,j);
+		printaddress(carr_buff,ui_col,start,raddress);
 		
-		j=printlinechar(sptr_fin,ui_col,start,length,j,carr_stdc,carr_stdc_str);
+		raddress=printlinechar(sptr_fin,ui_col,start,length,raddress,carr_stdc,carr_stdc_str);
 		
         putchar('\n');
 		
@@ -407,7 +406,7 @@ static void
 dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, size_t length)
 {
     unsigned int i, k;
-    size_t j, m, p;
+    size_t raddress, tmpraddress, diffaddress;
     fpos_t tmp1, tmp2;
 	int ch;
 
@@ -416,33 +415,33 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
     if (fsetpos(sptr_fin,&start))
 		return;
 
-	fgetpos(sptr_fin,&tmp2); j = 0;
+	fgetpos(sptr_fin,&tmp2); raddress = 0;
 	
-    while((ch=fgetc(sptr_fin))!=EOF && (j < length || length == -1)) {
+    while((ch=fgetc(sptr_fin))!=EOF && (raddress < length || length == -1)) {
 		
 		ungetc(ch,sptr_fin);
 		
         fgetpos(sptr_fin,&tmp1);
 		fsetpos(sptr_fin,&tmp2);
 		
-		m=j;
+		tmpraddress=raddress;
 		
-		printaddress(carr_buff,ui_col,start,j);
+		printaddress(carr_buff,ui_col,start,raddress);
 		
-		j=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,start,length,j);
-		p=j-m;
+		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,start,length,raddress);
+		diffaddress=raddress-tmpraddress;
 
-        if (!m && p < ui_col && p > 0)
+        if (!tmpraddress && diffaddress < ui_col && diffaddress > 0)
             printf(carr_DSEPERATE);
 
         else {
 
-            if ((j % ui_col) && (ui_col < length) && (((j <= length) && (length != -1)) || (length == -1)))
-                for (i = 0; i < (ui_col - j % ui_col); i++)
+            if ((raddress % ui_col) && (ui_col < length) && (((raddress <= length) && (length != -1)) || (length == -1)))
+                for (i = 0; i < (ui_col - raddress % ui_col); i++)
                     for (k = 0; k < LEN + 1; k++)
                         printf("%c", DELIM);
 
-            if (p)
+            if (diffaddress)
                 printf(carr_DSEPERATE);
             else
                 return;
@@ -451,7 +450,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
         fgetpos(sptr_fin,&tmp2);
         fsetpos(sptr_fin,&tmp1);
 		
-		j=printlinechar(sptr_fin,ui_col,start,length,m,carr_stdc,carr_stdc_str);
+		raddress=printlinechar(sptr_fin,ui_col,start,length,tmpraddress,carr_stdc,carr_stdc_str);
 
 		putchar('\n');
 
