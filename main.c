@@ -293,7 +293,6 @@ static void printaddress(char *carr_buff,const unsigned int ui_col,const fpos_t 
 static size_t printlinebyte(FILE *sptr_fin,char *carr_buff,
 				const unsigned int ui_col,
 				const unsigned int ui_base, const unsigned int ui_len,
-				const fpos_t start,
 				const size_t length,
 				size_t raddress)
 {
@@ -332,7 +331,7 @@ dumpByte(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsig
 		
 		printaddress(carr_buff,ui_col,start,raddress);
 		
-		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,ui_base,ui_len,start,length,raddress);
+		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,ui_base,ui_len,length,raddress);
 		
         putchar('\n');
 			
@@ -354,7 +353,6 @@ findStdC(int ch, const char* stdc)
 
 static size_t printlinechar(FILE *sptr_fin,
 				const unsigned int ui_col,
-				const fpos_t start,
 				const size_t length,
 				size_t raddress,const char *carr_stdc,const char *carr_stdc_str)
 {
@@ -392,7 +390,7 @@ dumpChar(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 		
 		printaddress(carr_buff,ui_col,start,raddress);
 		
-		raddress=printlinechar(sptr_fin,ui_col,start,length,raddress,carr_stdc,carr_stdc_str);
+		raddress=printlinechar(sptr_fin,ui_col,length,raddress,carr_stdc,carr_stdc_str);
 		
         putchar('\n');
 		
@@ -426,7 +424,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 		
 		printaddress(carr_buff,ui_col,start,raddress);
 		
-		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,start,length,raddress);
+		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,length,raddress);
 		column=raddress-beginraddress;
 
         if (!beginraddress && column && column < ui_col)
@@ -448,7 +446,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
         fgetpos(sptr_fin,&curpos);
         fsetpos(sptr_fin,&begpos);
 		
-		raddress=printlinechar(sptr_fin,ui_col,start,length,beginraddress,carr_stdc,carr_stdc_str);
+		raddress=printlinechar(sptr_fin,ui_col,length,beginraddress,carr_stdc,carr_stdc_str);
 
 		putchar('\n');
 
