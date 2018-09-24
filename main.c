@@ -36,30 +36,30 @@ dumpChar(FILE *sptr_fin,char* carr_buff, const unsigned int ui_col, const fpos_t
 static void
 dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsigned int ui_base, const unsigned int ui_len, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
 
-static const char* cpa_opt[] = { "-b", "-o", "-d", "-h", "-B" ,"-A",
-    "-c:", "-s:", "-l:", "-T" , NULL };
+static const char* cpa_opt[] = { "-b", "-o", "-d", "-h",
+    "-c:", "-s:", "-l:", "-B" ,"-A", "-T" , NULL };
 enum _opt {
     e_optbin,
     e_optoct,
     e_optdec,
     e_opthex,
-	e_optbyte,
-    e_optascii,
     e_optcol,
     e_optstart,
     e_optlength,
+	e_optbyte,
+    e_optascii,
     e_opttwoside
 };
 static const char* cpa_optdes[] = {
-	" Binary show",
-    " Octal Show",
-    " 10 base Show (Decimal)",
-    " Hex Show",
-	" Byte Show",
-    " ASCII Show",
+	" Binary Representation",
+    " Octal Representation",
+    " 10 base Representation",
+    " Hex Representation",
     "{n} n=number of column",
     "{n} n=offset",
     "{n} n=Length",
+	" Byte View",
+    " ASCII View",
     " Dual view",
     NULL };
 
@@ -118,7 +118,7 @@ int main(int argc, const char* argv[])
             ui_len = 8;
 
             if (!ui_colflag)
-                ui_col = 4;
+                ui_col = DCOLTWOSIDE/2;
 
             break;
 
@@ -127,7 +127,7 @@ int main(int argc, const char* argv[])
             ui_len = 3;
 
             if (!ui_colflag)
-                ui_col = 8;
+                ui_col = DCOLTWOSIDE;
 
             break;
 
@@ -136,7 +136,7 @@ int main(int argc, const char* argv[])
             ui_len = 3;
 
             if (!ui_colflag)
-                ui_col = 8;
+                ui_col = DCOLTWOSIDE;
 
             break;
 
@@ -145,16 +145,8 @@ int main(int argc, const char* argv[])
             ui_len = 2;
 
             if (!ui_colflag)
-                ui_col = 8;
+                ui_col = DCOLTWOSIDE;
 
-            break;
-
-        case e_optbyte:
-            i_actIndex = e_optbyte;
-            break;
-			
-        case e_optascii:
-            i_actIndex = e_optascii;
             break;
 
         case e_optcol:
@@ -194,6 +186,14 @@ int main(int argc, const char* argv[])
 
             ui_length = s2sT(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
 
+            break;
+			
+        case e_optbyte:
+            i_actIndex = e_optbyte;
+            break;
+			
+        case e_optascii:
+            i_actIndex = e_optascii;
             break;
 
         case e_opttwoside:
