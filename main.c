@@ -415,7 +415,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, unsigned int ui_col, fpos_t start, siz
     if (fsetpos(sptr_fin,&start))
 		return;
 
-	fgetpos(sptr_fin,&tmp1);fgetpos(sptr_fin,&tmp2); j = 0;
+	fgetpos(sptr_fin,&tmp2); j = 0;
 	
     while((ch=fgetc(sptr_fin))!=EOF && (j < length || length == -1)) {
 		
