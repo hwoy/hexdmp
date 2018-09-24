@@ -266,7 +266,7 @@ showErr(const char* err[], unsigned int index)
     return -1 * (++index);
 }
 
-static void printoutheader(char *carr_buff,int fchar,unsigned int length)
+static void printoutheader(const char *carr_buff,int fchar,unsigned int length)
 {
 	unsigned int i;
     for (i = 0; i < length; i++)
