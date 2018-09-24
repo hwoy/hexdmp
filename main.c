@@ -34,7 +34,7 @@ static void
 dumpChar(FILE *sptr_fin,char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
 
 static void
-dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
+dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const unsigned int ui_base, const unsigned int ui_len, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str);
 
 static const char* cpa_opt[] = { "-b", "-o", "-d", "-h", "-a",
     "-c:", "-s:", "-l:", "-t", NULL };
@@ -218,7 +218,7 @@ int main(int argc, const char* argv[])
 					break;
 
 				case e_opttwoside:
-					dumpDual(sptr_fin,carr_buff, ui_col, ui_start, ui_length, carr_stdc, carr_stdc_str);
+					dumpDual(sptr_fin,carr_buff, ui_col, BASE, LEN, ui_start, ui_length, carr_stdc, carr_stdc_str);
 					break;
 
 				default:
@@ -400,7 +400,10 @@ dumpChar(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 }
 
 static void
-dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_t start, const size_t length,const char *carr_stdc,const char *carr_stdc_str)
+dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col,
+		const unsigned int ui_base, const unsigned int ui_len,
+		const fpos_t start, const size_t length,
+		const char *carr_stdc,const char *carr_stdc_str)
 {
     unsigned int i, j;
     size_t raddress, beginraddress, column;
@@ -425,7 +428,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 		
 		printaddress(carr_buff,ui_col,start,raddress);
 		
-		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,BASE,LEN,length,raddress);
+		raddress=printlinebyte(sptr_fin,carr_buff,ui_col,ui_base,ui_len,length,raddress);
 		column=raddress-beginraddress;
 
         if (!beginraddress && column && column < ui_col)
@@ -435,7 +438,7 @@ dumpDual(FILE *sptr_fin, char* carr_buff, const unsigned int ui_col, const fpos_
 
             if ((raddress % ui_col) && (ui_col < length) && (((raddress <= length) && (length != -1)) || (length == -1)))
                 for (i = 0; i < (ui_col - raddress % ui_col); i++)
-                    for (j = 0; j < LEN + 1; j++)
+                    for (j = 0; j < ui_len + 1; j++)
                         printf("%c", DELIM);
 
             if (column)
