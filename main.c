@@ -15,10 +15,10 @@
 #define OFFBASE 16
 #define DLENGTH 2
 
-#define DCOLTWOSIDE 8
+#define COLTWOSIDE 8
 
 #define HEXPREF "0x"
-#define DSEPERATE " | "
+#define SEPERATE " | "
 
 static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret);
@@ -91,7 +91,7 @@ int main(int argc, const char* argv[])
     /******************* Set Default *********************/
 
     unsigned int ui_base = BASE;
-    unsigned int ui_col = DCOLTWOSIDE;
+    unsigned int ui_col = COLTWOSIDE;
     unsigned int ui_len = LEN;
     unsigned int ui_colflag = 0;
     fpos_t fpos_start = 0;
@@ -426,7 +426,7 @@ dumpDual(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigne
 		column=raddress-beginraddress;
 
         if (!beginraddress && column && column < ui_col)
-            printf(DSEPERATE);
+            printf(SEPERATE);
 
         else {
 
@@ -436,7 +436,7 @@ dumpDual(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigne
                         printf("%c", DELIM);
 
             if (column)
-                printf(DSEPERATE);
+                printf(SEPERATE);
             else
                 return;
         }
