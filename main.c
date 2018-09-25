@@ -94,9 +94,9 @@ int main(int argc, const char* argv[])
     unsigned int i;
     int i_actIndex;
 
-    if (argc == 1) {
+    if (argc == 1)
         return showHelp(argv[0], cpa_opt, cpa_optdes, 1);
-    }
+
     /******************* Set Default *********************/
 
     ui_base = BASE;
