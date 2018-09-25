@@ -22,8 +22,7 @@
 
 static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret);
-static const char *
-basename(const char* ch);
+
 static int
 showErr(const char* err[], unsigned int index);
 
@@ -232,6 +231,15 @@ int main(int argc, const char* argv[])
     return 0;
 }
 
+static const char *
+basename(const char* ch)
+{
+    const char *j;
+    for (j=ch; *ch; ++ch) if (*ch == '\\' || *ch == '/') j = ch+1;
+
+    return j;
+}
+
 static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret)
 {
@@ -246,15 +254,6 @@ showHelp(const char* path, const char* opt[], const char* optdes[], int ret)
     fputc('\n', stderr);
 
     return ret;
-}
-
-static const char *
-basename(const char* ch)
-{
-    const char *j;
-    for (j=ch; *ch; ++ch) if (*ch == '\\' || *ch == '/') j = ch+1;
-
-    return j;
 }
 
 static int
