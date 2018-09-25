@@ -107,11 +107,8 @@ int main(int argc, const char* argv[])
 	unsigned int ui_cindex, ui_pindex;
     unsigned int i;
 	
-    for (ui_cindex = DSTART;
-         (ui_pindex = opt_action(
-              argc, argv, cpa_opt, carr_buff, BSIZE, DSTART))
-         != e_optend;
-         ui_cindex++) {
+    for (ui_cindex = DSTART;(ui_pindex = opt_action(argc, argv, cpa_opt, carr_buff, BSIZE, DSTART))!= e_optend;ui_cindex++) 
+	{
 
         switch (ui_pindex) {
 
