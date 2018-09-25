@@ -17,8 +17,8 @@
 
 #define DCOLTWOSIDE 8
 
-#define carr_hexpref "0x"
-#define carr_DSEPERATE " | "
+#define HEXPREF "0x"
+#define DSEPERATE " | "
 
 static int
 showHelp(const char* path, const char* opt[], const char* optdes[], int ret);
@@ -78,6 +78,11 @@ enum _err {
 static const char carr_stdc[] = { '\0', '\a', '\b', '\f', '\n','\r', '\t', '\v', '\0', '\0' };
 
 static const char carr_stdc_str[] = { '0', 'a', 'b', 'f', 'n','r', 't', 'v', '\0' };
+
+static int isUintStr(const char *carr_buff)
+{
+	return (isUint(carr_buff) || (isUintHex(&carr_buff[strlen(HEXPREF)]) && !strncmp(carr_buff, HEXPREF, strlen(HEXPREF))));
+}
 
 int main(int argc, const char* argv[])
 {
@@ -141,13 +146,14 @@ int main(int argc, const char* argv[])
             break;
 
         case e_optcol:
-            if (!isUint(carr_buff) && (!isUintHex(&carr_buff[strlen(carr_hexpref)]) || strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref)))) {
+            if (!isUintStr(carr_buff)) {
                 fprintf(stderr, "PARAM: %s\n", carr_buff);
                 return showErr(cpa_err, e_errpar);
             }
-            i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
+			
+            i = (!strncmp(carr_buff, HEXPREF, strlen(HEXPREF))) ? 16 : 10;
 
-            if (!(ui_col = s2ui(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i)))
+            if (!(ui_col = s2ui(&carr_buff[(i == 16) ? strlen(HEXPREF) : 0], i)))
 
             {
                 fprintf(stderr, "PARAM: %s\n", carr_buff);
@@ -158,24 +164,26 @@ int main(int argc, const char* argv[])
             break;
 
         case e_optstart:
-            if (!isUint(carr_buff) && (!isUintHex(&carr_buff[strlen(carr_hexpref)]) || strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref)))) {
+            if (!isUintStr(carr_buff)) {
                 fprintf(stderr, "PARAM: %s\n", carr_buff);
                 return showErr(cpa_err, e_errpar);
             }
-            i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
+			
+            i = (!strncmp(carr_buff, HEXPREF, strlen(HEXPREF))) ? 16 : 10;
 
-            ui_start = s2fpos(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
+            ui_start = s2fpos(&carr_buff[(i == 16) ? strlen(HEXPREF) : 0], i);
 
             break;
 
         case e_optlength:
-            if (!isUint(carr_buff) && (!isUintHex(&carr_buff[strlen(carr_hexpref)]) || strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref)))) {
+            if (!isUintStr(carr_buff)) {
                 fprintf(stderr, "PARAM: %s\n", carr_buff);
                 return showErr(cpa_err, e_errpar);
             }
-            i = (!strncmp(carr_buff, carr_hexpref, strlen(carr_hexpref))) ? 16 : 10;
+			
+            i = (!strncmp(carr_buff, HEXPREF, strlen(HEXPREF))) ? 16 : 10;
 
-            st_length = s2sT(&carr_buff[(i == 16) ? strlen(carr_hexpref) : 0], i);
+            st_length = s2sT(&carr_buff[(i == 16) ? strlen(HEXPREF) : 0], i);
 
             break;
 			
@@ -423,7 +431,7 @@ dumpDual(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigne
 		column=raddress-beginraddress;
 
         if (!beginraddress && column && column < ui_col)
-            printf(carr_DSEPERATE);
+            printf(DSEPERATE);
 
         else {
 
@@ -433,7 +441,7 @@ dumpDual(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigne
                         printf("%c", DELIM);
 
             if (column)
-                printf(carr_DSEPERATE);
+                printf(DSEPERATE);
             else
                 return;
         }
