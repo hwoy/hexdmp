@@ -13,7 +13,7 @@
 
 #define OFFLEN (sizeof(size_t) * 8 / 4)
 #define OFFBASE 16
-#define DLENGTH 2
+#define FCHARLEN 2
 
 #define COLTWOSIDE 8
 
@@ -260,17 +260,17 @@ showErr(const char* err[], unsigned int index)
     return -1 * (++index);
 }
 
-static void printoutheader(const char * const path, const int fchar, const unsigned int length)
+static void printoutheader(const char * const path, const int fchar, const unsigned int fcharlen)
 {
 	unsigned int i;
 	
-    for (i = 0; i < length; i++)
+    for (i = 0; i < fcharlen; i++)
         putchar(fchar);
 
     printf(" %s ", basename(path));
 
-    for (i = 0; i < length; i++)
-        putchar('=');
+    for (i = 0; i < fcharlen; i++)
+        putchar(fchar);
 	
     putchar('\n');
 }
@@ -314,7 +314,7 @@ dumpByte(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigne
     size_t raddress=0;
 	int ch;
 	
-	printoutheader(path,FCHAR,DLENGTH);
+	printoutheader(path,FCHAR,FCHARLEN);
 
 
     if (fsetpos(sptr_fin,&start))
@@ -374,7 +374,7 @@ dumpChar(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigne
     size_t raddress=0;
 	int ch;
 
-	printoutheader(path,FCHAR,DLENGTH);
+	printoutheader(path,FCHAR,FCHARLEN);
 
     if (fsetpos(sptr_fin,&start))
         return;
@@ -404,7 +404,7 @@ dumpDual(FILE *sptr_fin, const char * const path, char* carr_buff, const unsigne
     fpos_t begpos, curpos;
 	int ch;
 
-	printoutheader(path,FCHAR,DLENGTH);
+	printoutheader(path,FCHAR,FCHARLEN);
 
     if (fsetpos(sptr_fin,&start))
 		return;
