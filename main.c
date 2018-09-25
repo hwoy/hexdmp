@@ -86,29 +86,27 @@ static int isUintStr(const char *carr_buff)
 int main(int argc, const char* argv[])
 {
 	static char carr_buff[BSIZE];
-	
 	FILE* sptr_fin;
-    unsigned int ui_cindex, ui_pindex, ui_base, ui_col, ui_len, ui_colflag;
-    fpos_t ui_start;
-	size_t st_length;
-    unsigned int i;
-    int i_actIndex;
+	
+    /******************* Set Default *********************/
+
+    unsigned int ui_base = BASE;
+    unsigned int ui_col = DCOLTWOSIDE;
+    unsigned int ui_len = LEN;
+    unsigned int ui_colflag = 0;
+    fpos_t fpos_start = 0;
+    size_t st_length = -1;
+    int i_actIndex = e_opttwoside;
+
+    /******************* Parameter Operation *********************/
 
     if (argc == 1)
         return showHelp(argv[0], cpa_opt, cpa_optdes, 1);
 
-    /******************* Set Default *********************/
-
-    ui_base = BASE;
-    ui_col = DCOLTWOSIDE;
-    ui_len = LEN;
-    ui_colflag = 0;
-    ui_start = 0;
-    st_length = -1;
-    i_actIndex = e_opttwoside;
-
-    /******************* Parameter Operation *********************/
-
+{
+	unsigned int ui_cindex, ui_pindex;
+    unsigned int i;
+	
     for (ui_cindex = DSTART;
          (ui_pindex = opt_action(
               argc, argv, cpa_opt, carr_buff, BSIZE, DSTART))
@@ -170,7 +168,7 @@ int main(int argc, const char* argv[])
 			
             i = (!strncmp(carr_buff, HEXPREF, strlen(HEXPREF))) ? 16 : 10;
 
-            ui_start = s2fpos(&carr_buff[(i == 16) ? strlen(HEXPREF) : 0], i);
+            fpos_start = s2fpos(&carr_buff[(i == 16) ? strlen(HEXPREF) : 0], i);
 
             break;
 
@@ -212,21 +210,22 @@ int main(int argc, const char* argv[])
 			{
 
 				case e_optascii:
-					dumpChar(sptr_fin, carr_buff, carr_buff, ui_col, ui_start, st_length, carr_stdc, carr_stdc_str);
+					dumpChar(sptr_fin, carr_buff, carr_buff, ui_col, fpos_start, st_length, carr_stdc, carr_stdc_str);
 					break;
 
 				case e_opttwoside:
-					dumpDual(sptr_fin, carr_buff, carr_buff, ui_col, ui_base, ui_len, ui_start, st_length, carr_stdc, carr_stdc_str);
+					dumpDual(sptr_fin, carr_buff, carr_buff, ui_col, ui_base, ui_len, fpos_start, st_length, carr_stdc, carr_stdc_str);
 					break;
 
 				default:
-					dumpByte(sptr_fin, carr_buff, carr_buff, ui_col, ui_base, ui_len, ui_start, st_length);
+					dumpByte(sptr_fin, carr_buff, carr_buff, ui_col, ui_base, ui_len, fpos_start, st_length);
             }
 			
 			fclose(sptr_fin);
 
         }
     }
+}
 
     return 0;
 }
